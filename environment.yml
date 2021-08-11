@@ -103,7 +103,7 @@ dependencies:
     - keras-applications==1.0.8
     - keras-preprocessing==1.1.0
     - markdown==3.1.1
-    - openssl==1.1.1
+    - pyopenssl
     - protobuf==3.9.1
     - tb-nightly==1.15.0a20190902
     - termcolor==1.1.0
