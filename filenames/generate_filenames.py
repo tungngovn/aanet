@@ -39,7 +39,8 @@ def gen_apolloscape():
 
     ## Generate training lists
     train_lists = []
-    train_dir = os.path.join(data_dir, "/stereo_train")
+    # train_dir = os.path.join(data_dir, "/stereo_train")
+    train_dir = data_dir + "/stereo_train"
     for train_img in os.listdir(train_dir + "/disparity"):
         train_lists.append(train_img)
 
@@ -56,7 +57,8 @@ def gen_apolloscape():
 
     ## Generate validation lists
     val_lists = []
-    val_dir = os.path.join(data_dir, "/stereo_test")
+    # val_dir = os.path.join(data_dir, "/stereo_test")
+    val_dir = data_dir + "/stereo_test"
     for val_img in os.listdir(val_dir + "/disparity"):
         val_lists.append(val_img)
 
