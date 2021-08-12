@@ -1,0 +1,9 @@
+dataloader/__pycache__/
+nets/__pycache__/
+nets/deform_conv/__pycache__/
+nets/deform_conv/build/
+nets/deform_conv/deform_conv_cuda.cpython-37m-x86_64-linux-gnu.so
+utils/__pycache__/
+__pycache__/
+checkpoints/
+pretrained/
