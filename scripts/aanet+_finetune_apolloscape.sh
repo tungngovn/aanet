@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Train on Apolloscape training set
-CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py \
+CUDA_VISIBLE_DEVICES=0,1,2 python train.py \
 --data_dir data/apolloscape \
 --dataset_name apolloscape \
 --checkpoint_dir checkpoints/apolloscape \
