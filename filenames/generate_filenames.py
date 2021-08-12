@@ -49,8 +49,8 @@ def gen_apolloscape():
             # left_img = train_dir + '/camera_5/' + img_name[0: len(img_name) - 5] + '.jpg'
             # right_img = train_dir + '/camera_6/' + img_name[0: len(img_name) - 6] + '6.jpg'
             # disp_img = train_dir + '/disparity/' + img_name
-            left_img = 'stereo_train/camera_5/' + img_name[0: len(img_name) - 5] + '.jpg'
-            right_img = 'stereo_train/camera_6/' + img_name[0: len(img_name) - 6] + '6.jpg'
+            left_img = 'stereo_train/camera_5/' + img_name[0: len(img_name) - 5] + '5.jpg'
+            right_img = 'stereo_train/camera_6/' + img_name[0: len(img_name) - 5] + '6.jpg'
             disp_img = 'stereo_train/disparity/' + img_name
 
             train_f.write(left_img + ' ')
@@ -67,8 +67,8 @@ def gen_apolloscape():
 
     with open(val_file, 'w') as val_f:
         for img_name in val_lists:
-            left_img = 'stereo_test/camera_5/' + img_name[0: len(img_name) - 5] + '.jpg'
-            right_img = 'stereo_test/camera_6/' + img_name[0: len(img_name) - 6] + '6.jpg'
+            left_img = 'stereo_test/camera_5/' + img_name[0: len(img_name) - 5] + '5.jpg'
+            right_img = 'stereo_test/camera_6/' + img_name[0: len(img_name) - 5] + '6.jpg'
             disp_img = 'stereo_test/disparity/' + img_name
 
             val_f.write(left_img + ' ')
