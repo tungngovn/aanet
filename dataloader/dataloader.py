@@ -49,11 +49,19 @@ class StereoDataset(Dataset):
             'test': 'filenames/KITTI_2015_test.txt'
         }
 
+        ## Add apolloscape dataset
+        apolloscape_dict = {
+            'train': 'filenames/apolloscape_train.txt',
+            'test': 'filenames/apolloscape_val.txt'
+        }
+        ## End adding
+
         dataset_name_dict = {
             'SceneFlow': sceneflow_finalpass_dict,
             'KITTI2012': kitti_2012_dict,
             'KITTI2015': kitti_2015_dict,
             'KITTI_mix': kitti_mix_dict,
+            'apolloscape': apolloscape_dict, ## Add apolloscape dataset to dataset dictionary
         }
 
         assert dataset_name in dataset_name_dict.keys()
