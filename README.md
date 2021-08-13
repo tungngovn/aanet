@@ -1,6 +1,98 @@
 # AANet
 
-PyTorch implementation of our paper: 
+# Finetuning AANet+ with Apollo scape dataset:
+
+## Installation
+
+Clone the project to PC:
+
+```
+git clone https://github.com/tungngovn/aanet.git
+```
+
+The code is based on PyTorch 1.2.0, CUDA 10.0 and python 3.7. 
+
+We recommend using [conda](https://www.anaconda.com/distribution/) for installation: 
+
+```shell
+cd /path/to/aanet
+conda env create -f environment.yml
+```
+
+Activate the conda environment:
+
+```shell
+conda activate aanet
+```
+
+After installing dependencies, build deformable convolution:
+
+```shell
+cd /path/to/aanet
+cd nets/deform_conv && bash build.sh
+```
+
+## Dataset Preparation
+
+Download [Apollo scape](http://apolloscape.auto/stereo.html), [KITTI 2012](http://www.cvlibs.net/datasets/kitti/eval_stereo_flow.php?benchmark=stereo) and [KITTI 2015](http://www.cvlibs.net/datasets/kitti/eval_scene_flow.php?benchmark=stereo) datasets.
+
+Create directory to store datasets:
+
+```shell
+mkdir -p ~/dataset/apolloscape
+mkdir -p ~/dataset/KITTI12
+mkdir -p ~/dataset/KITTI15
+```
+
+#### Download dataset from the google drive files of Tung Ngo:
+
+Clone the package to download google drive files:
+```
+git clone https://github.com/chentinghao/download_google_drive.git
+```
+
+Download a file with a shared link for everyone:
+```
+python download_google_drive/download_gdrive.py <gdrive_code> <file_name>
+```
+
+For example, if a shared link of a file is: https://drive.google.com/file/d/10hpqLND7j-FHh_ICzBLdkGP3GMHq7Es0/view?usp=sharing. Then the command is:
+
+```
+python download_google_drive/download_gdrive.py 10hpqLND7j-FHh_ICzBLdkGP3GMHq7Es0 ~/dataset/apolloscape/stereo_train.zip
+```
+
+After download, run a script to create a shortcut of the dataset directory inside the AANet directory. Edit the link to the dataset directory in `link_dataset.sh` then run these commands:
+
+```shell
+cd /path/to/aanet
+mkdir data
+sh scripts/link_dataset.sh
+```
+
+## Model Zoo
+
+All pretrained models are available in the [model zoo](MODEL_ZOO.md).
+
+We assume the downloaded weights are located under the `pretrained` directory. 
+
+Otherwise, you may need to change the corresponding paths in the scripts.
+
+## Finetuning
+
+Start training:
+
+```
+conda activate aanet
+cd /path/to/aanet
+sh scripts/aanet+_finetune_apolloscape.sh
+```
+
+#### End of Finetuning model on Apolloscape dataset
+
+
+
+PyTorch implementation of the paper: 
 
 **[AANet: Adaptive Aggregation Network for Efficient Stereo Matching](https://arxiv.org/abs/2004.09548)**, [CVPR 2020](http://cvpr2020.thecvf.com/)
 
@@ -30,68 +122,11 @@ The implementation of improved version **AANet+ (stronger performance & slightly
 
   All codes for training, validating, evaluating, inferencing and predicting on any stereo pair are provided!
 
-## Installation
 
-Our code is based on PyTorch 1.2.0, CUDA 10.0 and python 3.7. 
 
-We recommend using [conda](https://www.anaconda.com/distribution/) for installation: 
 
-```shell
-conda env create -f environment.yml
-```
 
-After installing dependencies, build deformable convolution:
 
-```shell
-cd nets/deform_conv && bash build.sh
-```
-
-## Dataset Preparation
-
-Download [Scene Flow](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html), [KITTI 2012](http://www.cvlibs.net/datasets/kitti/eval_stereo_flow.php?benchmark=stereo) and [KITTI 2015](http://www.cvlibs.net/datasets/kitti/eval_scene_flow.php?benchmark=stereo) datasets. 
-
-Our folder structure is as follows:
-
-```
-data
-├── KITTI
-│   ├── kitti_2012
-│   │   └── data_stereo_flow
-│   ├── kitti_2015
-│   │   └── data_scene_flow
-└── SceneFlow
-    ├── Driving
-    │   ├── disparity
-    │   └── frames_finalpass
-    ├── FlyingThings3D
-    │   ├── disparity
-    │   └── frames_finalpass
-    └── Monkaa
-        ├── disparity
-        └── frames_finalpass
-```
-
-If you would like to use the pseudo ground truth supervision introduced in our paper, you can download the pre-computed disparity on KITTI 2012 and KITTI 2015 training set here: [KITTI 2012](https://drive.google.com/open?id=1ZJhraqgY1sL4UfHBrVojttCbvNAXfdj0), [KITTI 2015](https://drive.google.com/open?id=14NGQp9CwIVNAK8ZQ6GSNeGraFGtVGOce). 
-
-For KITTI 2012, you should place the unzipped file `disp_occ_pseudo_gt` under `kitti_2012/data_stereo_flow/training` directory. 
-
-For KITTI 2015, you should place `disp_occ_0_pseudo_gt` under `kitti_2015/data_scene_flow/training`.
-
-It is recommended to symlink your dataset root to `$AANET/data`:
-
-```shell
-ln -s $YOUR_DATASET_ROOT data
-```
-
-Otherwise, you may need to change the corresponding paths in the scripts.
-
-## Model Zoo
-
-All pretrained models are available in the [model zoo](MODEL_ZOO.md).
-
-We assume the downloaded weights are located under the `pretrained` directory. 
-
-Otherwise, you may need to change the corresponding paths in the scripts.
 
 ## Inference
 
