@@ -1,6 +1,6 @@
 # AANet
 
-# Finetuning AANet+ with Apollo scape dataset:
+# Finetuning AANet+ with Apollo scape dataset
 
 ## Installation
 
@@ -88,7 +88,7 @@ cd /path/to/aanet
 sh scripts/aanet+_finetune_apolloscape.sh
 ```
 
-#### End of Finetuning model on Apolloscape dataset
+### End of Finetuning model on Apolloscape dataset
 
 
 
