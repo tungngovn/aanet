@@ -16,7 +16,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py \
 --feature_type ganet \
 --feature_pyramid \
 --refinement_type hourglass \
---milestones 40,60,80,90 \
+--milestones 15,30,50,70, 90 \
 --max_epoch 100 \
 --save_ckpt_freq 10 
 # --no_validate
