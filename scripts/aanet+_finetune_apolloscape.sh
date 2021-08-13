@@ -4,7 +4,7 @@
 CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py \
 --data_dir data/apolloscape \
 --dataset_name apolloscape \
---checkpoint_dir checkpoints/apolloscape \
+--checkpoint_dir checkpoints/apolloscape_2nd \
 --pretrained_aanet pretrained/aanet+_sceneflow-d3e13ef0.pth \
 --batch_size 4 \
 --val_batch_size 4 \
