@@ -3,6 +3,8 @@
 # Evaluate the best validation model on Scene Flow test set
 CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py \
 --mode test \
+--data_dir data/apolloscape \
+--dataset_name apolloscape \
 --checkpoint_dir checkpoints/apolloscape_2nd \
 --batch_size 4 \
 --val_batch_size 1 \
@@ -20,6 +22,8 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py \
 # Evaluate a specific model on Scene Flow test set
 CUDA_VISIBLE_DEVICES=0 python train.py \
 --mode test \
+--data_dir data/apolloscape \
+--dataset_name apolloscape \
 --checkpoint_dir checkpoints/apolloscape_2nd \
 --pretrained_aanet checkpoints/apolloscape_2nd/aanet_best.pth \
 --batch_size 4 \
