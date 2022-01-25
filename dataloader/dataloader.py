@@ -52,7 +52,8 @@ class StereoDataset(Dataset):
         ## Add apolloscape dataset
         apolloscape_dict = {
             'train': 'filenames/apolloscape_train.txt',
-            'test': 'filenames/apolloscape_val.txt'
+            'val': 'filenames/apolloscape_val.txt',
+            'test': 'filenames/apolloscape_test.txt'
         }
         ## End adding
 

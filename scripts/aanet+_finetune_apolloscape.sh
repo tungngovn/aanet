@@ -2,6 +2,7 @@
 
 # Train on Apolloscape training set
 CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py \
+--mode val \
 --data_dir data/apolloscape \
 --dataset_name apolloscape \
 --checkpoint_dir checkpoints/apolloscape_2nd \
