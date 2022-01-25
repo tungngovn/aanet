@@ -84,7 +84,8 @@ def load_pretrained_net(net, pretrained_path, return_epoch_iter=False, resume=Fa
         weights = state['state_dict'] if 'state_dict' in state.keys() else state
 
         for k, v in weights.items():
-            name = k[7:] if 'module' in k and not resume else k
+            # name = k[7:] if 'module' in k and not resume else k ## Edit to resume training
+            name = k[7:] if 'module' in k else k
             new_state_dict[name] = v
 
         if no_strict:
