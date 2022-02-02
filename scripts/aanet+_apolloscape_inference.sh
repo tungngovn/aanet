@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Inference on KITTI 2015 test set for submission
+CUDA_VISIBLE_DEVICES=0 python inference.py \
+--mode test \
+--data_dir data/apolloscape \
+--dataset_name apolloscape \
+--pretrained_aanet checkpoints/apolloscape_large_2nd \
+--batch_size 1 \
+--img_height 576 \
+--img_width 1920 \
+--feature_type ganet \
+--feature_pyramid \
+--refinement_type hourglass \
+--no_intermediate_supervision \
+--output_dir output/apolloscape/large_2nd
+
