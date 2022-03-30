@@ -106,7 +106,7 @@ def gen_apolloscape_road():
     ## Generate validation lists
     val_lists = []
     # val_dir = os.path.join(data_dir, "/stereo_test")
-    val_dir = data_dir + "road02_seg/Depth/Record022/Camera 5"
+    val_dir = data_dir + "/road02_seg/Depth/Record022/Camera 5"
     for val_img in os.listdir(val_dir):
         val_lists.append(val_img)
 
