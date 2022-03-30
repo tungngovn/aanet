@@ -75,6 +75,53 @@ def gen_apolloscape():
             val_f.write(right_img + ' ')
             val_f.write(disp_img + '\n')
 
+
+def gen_apolloscape_road():
+    data_dir = 'data/apolloscape'
+
+    # train_file = 'apolloscape_train.txt'
+    val_file = 'apolloscape_val.txt'
+
+    ## Generate training lists
+    # train_lists = []
+    # # train_dir = os.path.join(data_dir, "/stereo_train")
+    # train_dir = data_dir + "/stereo_train"
+    # for train_img in os.listdir(train_dir + "/disparity"):
+    #     train_lists.append(train_img)
+
+    # with open(train_file, 'w') as train_f:
+    #     for img_name in train_lists:
+    #         # left_img = train_dir + '/camera_5/' + img_name[0: len(img_name) - 5] + '.jpg'
+    #         # right_img = train_dir + '/camera_6/' + img_name[0: len(img_name) - 6] + '6.jpg'
+    #         # disp_img = train_dir + '/disparity/' + img_name
+    #         left_img = 'stereo_train/camera_5/' + img_name[0: len(img_name) - 5] + '5.jpg'
+    #         right_img = 'stereo_train/camera_6/' + img_name[0: len(img_name) - 5] + '6.jpg'
+    #         disp_img = 'stereo_train/disparity/' + img_name
+
+    #         train_f.write(left_img + ' ')
+    #         train_f.write(right_img + ' ')
+    #         train_f.write(disp_img + '\n')
+    # train_f.close()
+
+    ## Generate validation lists
+    val_lists = []
+    # val_dir = os.path.join(data_dir, "/stereo_test")
+    val_dir = data_dir + "road02_seg/Depth/Record022/Camera 5"
+    for val_img in os.listdir(val_dir):
+        val_lists.append(val_img)
+
+    with open(val_file, 'w') as val_f:
+        for img_name in val_lists:
+            left_img = 'road02_seg/ColorImage/Record022/Camera 5/' + img_name[0: len(img_name) - 5] + '5.jpg'
+            right_img = 'road02_seg/ColorImage/Record022/Camera 6/' + img_name[0: len(img_name) - 5] + '6.jpg'
+            disp_img = "road02_seg/Depth/Record022/Camera 5" + img_name
+
+            val_f.write(left_img + ' ')
+            val_f.write(right_img + ' ')
+            val_f.write(disp_img + '\n')
+
+
 if __name__ == '__main__':
     # gen_kitti_2015()
-    gen_apolloscape()
+    # gen_apolloscape()
+    gen_apolloscape_road()
