@@ -89,6 +89,8 @@ parser.add_argument('--val_metric', default='epe', help='Validation metric to se
 args = parser.parse_args()
 logger = utils.get_logger()
 
+# import pdb; pdb.set_trace()
+
 utils.check_path(args.checkpoint_dir)
 utils.save_args(args)
 
@@ -121,10 +123,14 @@ def main():
                                           load_pseudo_gt=args.load_pseudo_gt,
                                           transform=train_transform)
 
+
+
     logger.info('=> {} training samples found in the training set'.format(len(train_data)))
 
     train_loader = DataLoader(dataset=train_data, batch_size=args.batch_size, shuffle=True,
                               num_workers=args.num_workers, pin_memory=True, drop_last=True)
+
+    import pdb; pdb.set_trace()
 
     # Validation loader
     val_transform_list = [transforms.RandomCrop(args.val_img_height, args.val_img_width, validate=True),
@@ -222,6 +228,8 @@ def main():
     train_model = model.Model(args, logger, optimizer, aanet, device, start_iter, start_epoch,
                               best_epe=best_epe, best_epoch=best_epoch)
 
+    # import pdb; pdb.set_trace()
+
     logger.info('=> Start training...')
 
     if args.evaluate_only:
@@ -229,6 +237,7 @@ def main():
         train_model.validate(val_loader)
     else:
         for _ in range(start_epoch, args.max_epoch):
+            # import pdb; pdb.set_trace()
             if not args.evaluate_only:
                 train_model.train(train_loader)
             if not args.no_validate:

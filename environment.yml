@@ -1,4 +1,4 @@
-name: aanet
+name: aanet1
 channels:
   - pytorch
   - anaconda

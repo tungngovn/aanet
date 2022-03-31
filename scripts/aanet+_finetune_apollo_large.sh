@@ -1,18 +1,18 @@
-!/usr/bin/env bash
+#!/usr/bin/env bash
 
 # Train on Apolloscape training set
-CUDA_VISIBLE_DEVICES=2,3 python train.py \
+CUDA_VISIBLE_DEVICES=0 python train.py \
 --mode val \
 --data_dir data/apolloscape \
 --dataset_name apolloscape \
---checkpoint_dir checkpoints/apolloscape_large_v2_1st \
+--checkpoint_dir checkpoints/apolloscape_large_672x1440 \
 --pretrained_aanet pretrained/aanet+_sceneflow-d3e13ef0.pth \
---batch_size 2 \
+--batch_size 1 \
 --val_batch_size 1 \
---img_height 672 \
---img_width 1440 \
---val_img_height 672 \
---val_img_width 1440 \
+--img_height 384 \
+--img_width 1248 \
+--val_img_height 384 \
+--val_img_width 1248 \
 --max_disp 192 \
 --feature_type ganet \
 --feature_pyramid \
