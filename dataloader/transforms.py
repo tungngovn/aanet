@@ -117,6 +117,68 @@ class RandomCrop(object):
 
         return sample
 
+
+class ObjCrop(object):
+    def __init__(self, img_height, img_width, validate=False):
+        self.img_height = img_height
+        self.img_width = img_width
+        self.validate = validate
+
+    def __call__(self, sample):
+        ori_height, ori_width = sample['left'].shape[:2]
+        if self.img_height > ori_height or self.img_width > ori_width:
+            top_pad = self.img_height - ori_height
+            right_pad = self.img_width - ori_width
+
+            assert top_pad >= 0 and right_pad >= 0
+
+            sample['left'] = np.lib.pad(sample['left'],
+                                        ((top_pad, 0), (0, right_pad), (0, 0)),
+                                        mode='constant',
+                                        constant_values=0)
+            sample['right'] = np.lib.pad(sample['right'],
+                                         ((top_pad, 0), (0, right_pad), (0, 0)),
+                                         mode='constant',
+                                         constant_values=0)
+            if 'disp' in sample.keys():
+                sample['disp'] = np.lib.pad(sample['disp'],
+                                            ((top_pad, 0), (0, right_pad)),
+                                            mode='constant',
+                                            constant_values=0)
+
+            if 'pseudo_disp' in sample.keys():
+                sample['pseudo_disp'] = np.lib.pad(sample['pseudo_disp'],
+                                                   ((top_pad, 0), (0, right_pad)),
+                                                   mode='constant',
+                                                   constant_values=0)
+
+        else:
+            assert self.img_height <= ori_height and self.img_width <= ori_width
+
+            # Training: random crop
+            if not self.validate:
+
+                self.offset_x = np.random.randint(ori_width - self.img_width + 1)
+
+                start_height = 0
+                assert ori_height - start_height >= self.img_height
+
+                self.offset_y = np.random.randint(start_height, ori_height - self.img_height + 1)
+
+            # Validatoin, center crop
+            else:
+                self.offset_x = (ori_width - self.img_width) // 2
+                self.offset_y = (ori_height - self.img_height) // 2
+
+            sample['left'] = self.crop_img(sample['left'])
+            sample['right'] = self.crop_img(sample['right'])
+            if 'disp' in sample.keys():
+                sample['disp'] = self.crop_img(sample['disp'])
+            if 'pseudo_disp' in sample.keys():
+                sample['pseudo_disp'] = self.crop_img(sample['pseudo_disp'])
+
+        return sample
+
     def crop_img(self, img):
         return img[self.offset_y:self.offset_y + self.img_height,
                self.offset_x:self.offset_x + self.img_width]
