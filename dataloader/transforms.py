@@ -117,6 +117,10 @@ class RandomCrop(object):
 
         return sample
 
+    def crop_img(self, img):
+        return img[self.offset_y:self.offset_y + self.img_height,
+               self.offset_x:self.offset_x + self.img_width]
+
 
 class ObjCrop(object):
     def __init__(self, img_height, img_width, validate=False):
@@ -167,14 +171,14 @@ class ObjCrop(object):
 
             # Validatoin, center crop
             else:
-                # self.offset_x = (ori_width - self.img_width) // 2
-                # self.offset_y = (ori_height - self.img_height) // 2
+                self.offset_x = (ori_width - self.img_width) // 2
+                self.offset_y = (ori_height - self.img_height) // 2
 
                 ## Depth estimate only interested region
                 left_img = np.zeros_like(sample['left'])
                 right_img = np.zeros_like(sample['right'])
                 disp_img = np.zeros_like(sample['disp'])
-                
+              
 
                 for bbox in sample['left_bboxes']:
                     self.x_min = bbox[1]
@@ -202,7 +206,14 @@ class ObjCrop(object):
                 sample['right'] = right_img
                 sample['disp'] = disp_img
 
-                import pdb; pdb.set_trace()
+            sample['left'] = self.crop_img(sample['left'])
+            sample['right'] = self.crop_img(sample['right'])
+            if 'disp' in sample.keys():
+                sample['disp'] = self.crop_img(sample['disp'])
+            if 'pseudo_disp' in sample.keys():
+                sample['pseudo_disp'] = self.crop_img(sample['pseudo_disp'])
+
+            import pdb; pdb.set_trace()
 
         return sample
 
@@ -210,9 +221,10 @@ class ObjCrop(object):
         # cropped_img = np.zeros_like(img)
         dest_img[self.y_min:self.y_max, self.x_min:self.x_max ] = src_img[self.y_min:self.y_max, self.x_min:self.x_max ]
         return dest_img
-        # return img[self.y_min:self.y_max, self.x_min:self.x_max ]
-        # return img[self.offset_y:self.offset_y + self.img_height,
-            #    self.offset_x:self.offset_x + self.img_width]
+
+    def crop_img(self, img):
+        return img[self.offset_y:self.offset_y + self.img_height,
+               self.offset_x:self.offset_x + self.img_width]
 
 
 class RandomVerticalFlip(object):
