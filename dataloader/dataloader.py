@@ -151,10 +151,10 @@ class StereoDataset(Dataset):
 
         sample['left'] = read_img(sample_path['left'])  # [H, W, 3]
         sample['right'] = read_img(sample_path['right'])
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
 
-        img_height = sample['left']#.shape(0)
-        img_width = sample['left']#.shape(1)
+        img_height = sample['left'].shape[0]
+        img_width = sample['left'].shape[1]
 
         ### Bboxes
         sample['left_bboxes'] = self.bboxes(sample_path['left_bbox'], img_width, img_height) 
