@@ -174,6 +174,8 @@ class ObjCrop(object):
                 self.offset_x = (ori_width - self.img_width) // 2
                 self.offset_y = (ori_height - self.img_height) // 2
 
+                '''
+
                 ## Depth estimate only interested region
                 left_img = np.zeros_like(sample['left'])
                 right_img = np.zeros_like(sample['right'])
@@ -205,13 +207,27 @@ class ObjCrop(object):
                 sample['left'] = left_img
                 sample['right'] = right_img
                 sample['disp'] = disp_img
+                '''
 
-            sample['left'] = self.crop_img(sample['left'])
-            sample['right'] = self.crop_img(sample['right'])
+                bbox = sample['left_bboxes'][0]
+                self.x_min = bbox[1]
+                self.y_min = bbox[2]
+                self.x_max = bbox[3]
+                self.y_max = bbox[4]
+
+            # sample['left'] = self.crop_img(sample['left'])
+            # sample['right'] = self.crop_img(sample['right'])
+            # if 'disp' in sample.keys():
+            #     sample['disp'] = self.crop_img(sample['disp'])
+            # if 'pseudo_disp' in sample.keys():
+            #     sample['pseudo_disp'] = self.crop_img(sample['pseudo_disp'])
+
+            sample['left'] = self.crop_bbox(sample['left'])
+            sample['right'] = self.crop_bbox(sample['right'])
             if 'disp' in sample.keys():
-                sample['disp'] = self.crop_img(sample['disp'])
+                sample['disp'] = self.crop_bbox(sample['disp'])
             if 'pseudo_disp' in sample.keys():
-                sample['pseudo_disp'] = self.crop_img(sample['pseudo_disp'])
+                sample['pseudo_disp'] = self.crop_bbox(sample['pseudo_disp'])
 
             import pdb; pdb.set_trace()
 
@@ -221,6 +237,9 @@ class ObjCrop(object):
         # cropped_img = np.zeros_like(img)
         dest_img[self.y_min:self.y_max, self.x_min:self.x_max ] = src_img[self.y_min:self.y_max, self.x_min:self.x_max ]
         return dest_img
+
+    def crop_bbox(self, img):
+        return img[self.y_min:self.y_max, self.x_min:self.x_max]
 
     def crop_img(self, img):
         return img[self.offset_y:self.offset_y + self.img_height,
