@@ -8,6 +8,8 @@ import os
 from utils import utils
 from utils.file_io import read_img, read_disp
 
+import json ## add to act with bounding boxes
+
 
 class StereoDataset(Dataset):
     def __init__(self, data_dir,
@@ -74,6 +76,9 @@ class StereoDataset(Dataset):
 
         lines = utils.read_text_lines(data_filenames)
 
+        left_json_file = ''
+        left_bboxes = json.load(left_json_file)
+
         for line in lines:
             splits = line.split()
 
@@ -103,7 +108,38 @@ class StereoDataset(Dataset):
             else:
                 sample['pseudo_disp'] = None
 
+            ### Add attribute 'left_bbox' to the sample
+            img_name = left_img[-29:-13]
+            img = [img for img in left_bboxes if img_name in img['filename']]
+
+            sample['left_bbox'] = img[0]['objects']
+
             self.samples.append(sample)
+
+
+    def bboxes(self, objects, img_width, img_height):
+        bbox_list = []
+        for obj in objects:
+            c = obj['class_id']
+            center_x = obj['relative_coordinates']['center_x']
+            center_y = obj['relative_coordinates']['center_y']
+            w_obj = obj['relative_coordinates']['width']
+            h_obj = obj['relative_coordinates']['height']
+
+            x_center = int(float(center_x)*img_width)
+            y_center = int((float(center_y))*img_height)
+            w = int(float(w_obj)*img_width)
+            h = int(float(h_obj)*img_height)
+
+            # PIL coordinates are different from OpenCV coordinates
+            x_min = int(x_center - w/2)
+            y_min = int(y_center - h/2)
+
+            bbox = [c, x_min, y_min, x_min + w, y_min + h]
+
+            bbox_list.append(bbox)
+        return bbox_list
+        pass        
 
     def __getitem__(self, index):
         sample = {}
@@ -114,6 +150,13 @@ class StereoDataset(Dataset):
 
         sample['left'] = read_img(sample_path['left'])  # [H, W, 3]
         sample['right'] = read_img(sample_path['right'])
+
+        img_height = sample['left'].shape(0)
+        img_width = sample['left'].shape(1)
+
+        ### Bboxes
+        sample['left_bboxes'] = self.bboxes(sample_path['left_bbox'], img_width, img_height) 
+        import pdb; pdb.set_trace()
 
         # GT disparity of subset if negative, finalpass and cleanpass is positive
         subset = True if 'subset' in self.dataset_name else False
