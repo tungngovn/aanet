@@ -76,8 +76,9 @@ class StereoDataset(Dataset):
 
         lines = utils.read_text_lines(data_filenames)
 
-        left_json_file = ''
-        left_bboxes = json.load(left_json_file)
+        left_json_file = 'filenames/stereo_test_static_traffic_result.json'
+        left_bbox_file = open(left_json_file)
+        left_bboxes = json.load(left_bbox_file)
 
         for line in lines:
             splits = line.split()
