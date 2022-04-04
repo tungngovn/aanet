@@ -55,7 +55,8 @@ class StereoDataset(Dataset):
         apolloscape_dict = {
             'train': 'filenames/apolloscape_train.txt',
             'val': 'filenames/apolloscape_val.txt',
-            'test': 'filenames/apolloscape_test.txt'
+            # 'test': 'filenames/apolloscape_test.txt'
+            'test': 'filenames/apolloscape_one_img.txt'
         }
         ## End adding
 
@@ -76,9 +77,13 @@ class StereoDataset(Dataset):
 
         lines = utils.read_text_lines(data_filenames)
 
-        left_json_file = 'filenames/stereo_test_static_traffic_result.json'
+        left_json_file = 'filenames/stereo_test_left_traffic_result.json'
         left_bbox_file = open(left_json_file)
         left_bboxes = json.load(left_bbox_file)
+
+        right_json_file = 'filenames/stereo_test_right_traffic_result.json'
+        right_bbox_file = open(right_json_file)
+        right_bboxes = json.load(right_bbox_file)
 
         for line in lines:
             splits = line.split()
@@ -111,9 +116,11 @@ class StereoDataset(Dataset):
 
             ### Add attribute 'left_bbox' to the sample
             img_name = left_img[-29:-13]
-            img = [img for img in left_bboxes if img_name in img['filename']]
+            imgL = [img for img in left_bboxes if img_name in img['filename']]
+            imgR = [img for img in right_bboxes if img_name in img['filename']]
 
-            sample['left_bbox'] = img[0]['objects']
+            sample['left_bbox'] = imgL[0]['objects']
+            sample['right_bbox'] = imgR[0]['objects']
 
             self.samples.append(sample)
 
@@ -151,14 +158,14 @@ class StereoDataset(Dataset):
 
         sample['left'] = read_img(sample_path['left'])  # [H, W, 3]
         sample['right'] = read_img(sample_path['right'])
-        # import pdb; pdb.set_trace()
 
         img_height = sample['left'].shape[0]
         img_width = sample['left'].shape[1]
 
         ### Bboxes
-        sample['left_bboxes'] = self.bboxes(sample_path['left_bbox'], img_width, img_height) 
-        # import pdb; pdb.set_trace()
+        sample['left_bboxes'] = self.bboxes(sample_path['left_bbox'], img_width, img_height)
+        sample['right_bboxes'] = self.bboxes(sample_path['right_bbox'], img_width, img_height) 
+        import pdb; pdb.set_trace()
 
         # GT disparity of subset if negative, finalpass and cleanpass is positive
         subset = True if 'subset' in self.dataset_name else False
