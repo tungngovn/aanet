@@ -209,11 +209,11 @@ class ObjCrop(object):
                 sample['disp'] = disp_img
                 '''
 
-                bboxL = sample['left_bboxes'][0]
-                bboxR = sample['right_bboxes'][0]
-                self.x_min = bboxL[1]
+                bboxL = sample['left_bboxes'][14]
+                bboxR = sample['right_bboxes'][12]
+                self.x_min = bboxR[1]
                 self.y_min = min(bboxL[2], bboxR[2])
-                self.x_max = bboxR[3]
+                self.x_max = bboxL[3]
                 self.y_max = max(bboxL[4], bboxR[4])
 
             # sample['left'] = self.crop_img(sample['left'])
