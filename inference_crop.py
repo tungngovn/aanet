@@ -89,7 +89,7 @@ def main():
 
     # Test loader
     test_transform = transforms.Compose([
-        transforms.ObjCrop(args.img_height, args.img_width, validate=True),
+        # transforms.ObjCrop(args.img_height, args.img_width, validate=True),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)])
     test_data = dataloader.StereoDataset(data_dir=args.data_dir,
@@ -149,62 +149,66 @@ def main():
         if i % 100 == 0:
             print('=> Inferencing %d/%d' % (i, num_samples))
 
-        left = sample['left'].to(device)  # [B, 3, H, W]
-        right = sample['right'].to(device)
+        for j, bbox in enumerate(sample['left_bboxes']):
+            ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
 
-        # Pad
-        ori_height, ori_width = left.size()[2:]
-        if ori_height < args.img_height or ori_width < args.img_width:
-            top_pad = args.img_height - ori_height
-            right_pad = args.img_width - ori_width
+            left = sample['left'][bbox[2]:bbox[4],bbox[1]:bbox[3]].to(device)  # [B, 3, H, W]
+            right = sample['right'][bbox[2]:bbox[4],bbox[1]:bbox[3]].to(device)
 
-            # Pad size: (left_pad, right_pad, top_pad, bottom_pad)
-            left = F.pad(left, (0, right_pad, top_pad, 0))
-            right = F.pad(right, (0, right_pad, top_pad, 0))
+            # Pad
+            # ori_height, ori_width = left.size()[2:]
+            ori_height, ori_width = sample['left'].to(device).size()[2:]
+            if ori_height < args.img_height or ori_width < args.img_width:
+                top_pad = args.img_height - ori_height
+                right_pad = args.img_width - ori_width
 
-        # Warpup
-        if i == 0 and args.count_time:
+                # Pad size: (left_pad, right_pad, top_pad, bottom_pad)
+                left = F.pad(left, (0, right_pad, top_pad, 0))
+                right = F.pad(right, (0, right_pad, top_pad, 0))
+
+            # Warpup
+            if i == 0 and args.count_time:
+                with torch.no_grad():
+                    for _ in range(10):
+                        aanet(left, right)
+
+            num_imgs += left.size(0)
+
             with torch.no_grad():
-                for _ in range(10):
-                    aanet(left, right)
+                time_start = time.perf_counter()
+                pred_disp = aanet(left, right)[-1]  # [B, H, W]
+                inference_time += time.perf_counter() - time_start
 
-        num_imgs += left.size(0)
+            if pred_disp.size(-1) < left.size(-1):
+                pred_disp = pred_disp.unsqueeze(1)  # [B, 1, H, W]
+                pred_disp = F.interpolate(pred_disp, (left.size(-2), left.size(-1)),
+                                        mode='bilinear') * (left.size(-1) / pred_disp.size(-1))
+                pred_disp = pred_disp.squeeze(1)  # [B, H, W]
 
-        with torch.no_grad():
-            time_start = time.perf_counter()
-            pred_disp = aanet(left, right)[-1]  # [B, H, W]
-            inference_time += time.perf_counter() - time_start
-
-        if pred_disp.size(-1) < left.size(-1):
-            pred_disp = pred_disp.unsqueeze(1)  # [B, 1, H, W]
-            pred_disp = F.interpolate(pred_disp, (left.size(-2), left.size(-1)),
-                                      mode='bilinear') * (left.size(-1) / pred_disp.size(-1))
-            pred_disp = pred_disp.squeeze(1)  # [B, H, W]
-
-        # Crop
-        if ori_height < args.img_height or ori_width < args.img_width:
-            if right_pad != 0:
-                pred_disp = pred_disp[:, top_pad:, :-right_pad]
-            else:
-                pred_disp = pred_disp[:, top_pad:]
-
-        for b in range(pred_disp.size(0)):
-            disp = pred_disp[b].detach().cpu().numpy()  # [H, W]
-            save_name = sample['left_name'][b]
-            save_name = os.path.join(args.output_dir, save_name)
-            utils.check_path(os.path.dirname(save_name))
-            if not args.count_time:
-                if args.save_type == 'pfm':
-                    if args.visualize:
-                        skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
-
-                    save_name = save_name[:-3] + 'pfm'
-                    write_pfm(save_name, disp)
-                elif args.save_type == 'npy':
-                    save_name = save_name[:-3] + 'npy'
-                    np.save(save_name, disp)
+            # Crop
+            if ori_height < args.img_height or ori_width < args.img_width:
+                if right_pad != 0:
+                    pred_disp = pred_disp[:, top_pad:, :-right_pad]
                 else:
-                    skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+                    pred_disp = pred_disp[:, top_pad:]
+
+            for b in range(pred_disp.size(0)):
+                disp = pred_disp[b].detach().cpu().numpy()  # [H, W]
+                save_name = str(j) + '_' + sample['left_name'][b]
+                save_name = os.path.join(args.output_dir, save_name)
+                utils.check_path(os.path.dirname(save_name))
+                if not args.count_time:
+                    if args.save_type == 'pfm':
+                        if args.visualize:
+                            skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+
+                        save_name = save_name[:-3] + 'pfm'
+                        write_pfm(save_name, disp)
+                    elif args.save_type == 'npy':
+                        save_name = save_name[:-3] + 'npy'
+                        np.save(save_name, disp)
+                    else:
+                        skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
 
     print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
 
