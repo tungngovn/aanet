@@ -152,8 +152,8 @@ def main():
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
 
-            left = sample['left'][bbox[2]:bbox[4],bbox[1]:bbox[3]].to(device)  # [B, 3, H, W]
-            right = sample['right'][bbox[2]:bbox[4],bbox[1]:bbox[3]].to(device)
+            left = sample['left'][:,:,bbox[2]:bbox[4],bbox[1]:bbox[3]].to(device)  # [B, 3, H, W]
+            right = sample['right'][:,:,bbox[2]:bbox[4],bbox[1]:bbox[3]].to(device)
 
             # Pad
             # ori_height, ori_width = left.size()[2:]
