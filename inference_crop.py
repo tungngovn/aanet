@@ -197,7 +197,7 @@ def main():
                 pred_disp = pred_disp.squeeze(1)  # [B, H, W]
 
             # Crop
-            if ori_height < args.img_height or yesori_width < args.img_width:
+            if ori_height < args.img_height or ori_width < args.img_width:
                 if right_pad != 0:
                     pred_disp = pred_disp[:, top_pad:, :-right_pad]
                 else:
