@@ -90,6 +90,7 @@ def main():
     # Test loader
     test_transform = transforms.Compose([
         # transforms.ObjCrop(args.img_height, args.img_width, validate=True),
+        transforms.RandomCrop(args.img_height, args.img_width, validate=True),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)])
     test_data = dataloader.StereoDataset(data_dir=args.data_dir,
@@ -116,8 +117,6 @@ def main():
                        refinement_type=args.refinement_type,
                        mdconv_dilation=args.mdconv_dilation,
                        deformable_groups=args.deformable_groups).to(device)
-
-    # print(aanet)
 
     if os.path.exists(args.pretrained_aanet):
         print('=> Loading pretrained AANet:', args.pretrained_aanet)
@@ -152,8 +151,19 @@ def main():
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
 
-            left = sample['left'][:,:,bbox[2]:bbox[4],bbox[1]:bbox[3]].to(device)  # [B, 3, H, W]
-            right = sample['right'][:,:,bbox[2]:bbox[4],bbox[1]:bbox[3]].to(device)
+            x_min = bbox[1]
+            x_max = bbox[3]
+            y_min = bbox[2]
+            y_max = bbox[4]
+
+            crop_width = x_max - x_min
+            crop_height = y_max - y_min
+
+            x_min = x_min - (96-crop_width%96)
+            y_min = y_min - (96-crop_height%96)
+
+            left = sample['left'][:,:,y_min:y_max,x_min:x_max].to(device)  # [B, 3, H, W]
+            right = sample['right'][:,:,y_min:y_max,x_min:x_max].to(device)
 
             # Pad
             # ori_height, ori_width = left.size()[2:]
