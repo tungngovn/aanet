@@ -14,6 +14,8 @@ from dataloader import transforms
 from utils import utils
 from utils.file_io import write_pfm
 
+from metric import d1_metric, thres_metric
+
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
@@ -164,6 +166,7 @@ def main():
 
             left = sample['left'][:,:,y_min:y_max,x_min:x_max].to(device)  # [B, 3, H, W]
             right = sample['right'][:,:,y_min:y_max,x_min:x_max].to(device)
+            gt_disp = sample['disp'][:,:,y_min:y_max,x_min:x_max].to(device)
 
             # Pad
             # ori_height, ori_width = left.size()[2:]
@@ -202,6 +205,10 @@ def main():
                     pred_disp = pred_disp[:, top_pad:, :-right_pad]
                 else:
                     pred_disp = pred_disp[:, top_pad:]
+
+            mask = (gt_disp > 0) & (gt_disp < args.max_disp)
+            thres1 = thres_metric(pred_disp, gt_disp, mask, 1.0)
+            print('1-pixel error: ', thres1)
 
             for b in range(pred_disp.size(0)):
                 disp = pred_disp[b].detach().cpu().numpy()  # [H, W]
