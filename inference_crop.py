@@ -176,6 +176,7 @@ def main():
 
             with torch.no_grad():
                 time_start = time.perf_counter()
+                import pdb; pdb.set_trace()
                 pred_disp = aanet(left, right)[-1]  # [B, H, W]
                 inference_time += time.perf_counter() - time_start
 
