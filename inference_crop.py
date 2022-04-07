@@ -166,7 +166,7 @@ def main():
 
             left = sample['left'][:,:,y_min:y_max,x_min:x_max].to(device)  # [B, 3, H, W]
             right = sample['right'][:,:,y_min:y_max,x_min:x_max].to(device)
-            gt_disp = sample['disp'][y_min:y_max,x_min:x_max].to(device)
+            gt_disp = sample['disp'][:,y_min:y_max,x_min:x_max].to(device)
 
             # Pad
             # ori_height, ori_width = left.size()[2:]
@@ -189,7 +189,7 @@ def main():
 
             with torch.no_grad():
                 time_start = time.perf_counter()
-                import pdb; pdb.set_trace()
+                # import pdb; pdb.set_trace()
                 pred_disp = aanet(left, right)[-1]  # [B, H, W]
                 inference_time += time.perf_counter() - time_start
 
@@ -207,8 +207,14 @@ def main():
                     pred_disp = pred_disp[:, top_pad:]
 
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
-            thres1 = thres_metric(pred_disp, gt_disp, mask, 1.0)
-            print('1-pixel error: ', thres1)
+            import pdb; pdb.set_trace()
+            thres3 = thres_metric(pred_disp, gt_disp, mask, 3.0)
+            print('1-pixel error: ', thres3)
+
+            epe = F.l1_loss(gt_disp[mask], pred_disp[mask], reduction='mean')
+
+            # d1 = d1_metric(pred_disp, gt_disp, mask)
+            print('EPE: ', epe)
 
             for b in range(pred_disp.size(0)):
                 disp = pred_disp[b].detach().cpu().numpy()  # [H, W]
