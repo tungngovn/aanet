@@ -1,3 +1,4 @@
+from concurrent.futures import process
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -14,7 +15,9 @@ from dataloader import transforms
 from utils import utils
 from utils.file_io import write_pfm
 
+## Tung's import
 from metric import d1_metric, thres_metric
+import torch.multiprocessing as mp
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
@@ -120,6 +123,9 @@ def main():
                        mdconv_dilation=args.mdconv_dilation,
                        deformable_groups=args.deformable_groups).to(device)
 
+    ## Add to multiprocessing
+    aanet.share_memory()
+
     if os.path.exists(args.pretrained_aanet):
         print('=> Loading pretrained AANet:', args.pretrained_aanet)
         utils.load_pretrained_net(aanet, args.pretrained_aanet, no_strict=True)
@@ -149,6 +155,9 @@ def main():
 
         if i % 100 == 0:
             print('=> Inferencing %d/%d' % (i, num_samples))
+        
+        num_processes = len(sample['left_bboxes'])
+        processes = []
 
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
@@ -190,6 +199,11 @@ def main():
             with torch.no_grad():
                 time_start = time.perf_counter()
                 import pdb; pdb.set_trace()
+
+                p = mp.Process(target=aanet, args=(left, right))
+                p.start()
+                processes.append(p)
+
                 pred_disp = aanet(left, right)[-1]  # [B, H, W]
                 inference_time += time.perf_counter() - time_start
 
@@ -227,6 +241,8 @@ def main():
                         np.save(save_name, disp)
                     else:
                         skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+        for p in processes:
+            p.join()
 
     print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
 
