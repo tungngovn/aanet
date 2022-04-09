@@ -161,11 +161,11 @@ def main():
             crop_width = x_max - x_min
             crop_height = y_max - y_min
 
-            x_min = x_min - (96-crop_width%96)
-            y_min = y_min - (96-crop_height%96)
+            x_min_p = x_min - (96-crop_width%96)
+            y_min_p = y_min - (96-crop_height%96)
 
-            left = sample['left'][:,:,y_min:y_max,x_min:x_max].to(device)  # [B, 3, H, W]
-            right = sample['right'][:,:,y_min:y_max,x_min:x_max].to(device)
+            left = sample['left'][:,:,y_min_p:y_max,x_min_p:x_max].to(device)  # [B, 3, H, W]
+            right = sample['right'][:,:,y_min_p:y_max,x_min_p:x_max].to(device)
             gt_disp = sample['disp'][:,y_min:y_max,x_min:x_max].to(device)
 
             # Pad
@@ -206,9 +206,12 @@ def main():
                 else:
                     pred_disp = pred_disp[:, top_pad:]
 
+            x_min_bb = (96-crop_width%96)
+            y_min_bb = (96-crop_height%96)
+            pred_disp_bb = pred_disp[:, y_min_bb:, x_min_bb:]
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
             import pdb; pdb.set_trace()
-            thres3 = thres_metric(pred_disp, gt_disp, mask, 3.0)
+            thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
             print('1-pixel error: ', thres3)
 
             epe = F.l1_loss(gt_disp[mask], pred_disp[mask], reduction='mean')
