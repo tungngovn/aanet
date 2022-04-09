@@ -214,7 +214,7 @@ def main():
             thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
             print('1-pixel error: ', thres3)
 
-            epe = F.l1_loss(gt_disp[mask], pred_disp[mask], reduction='mean')
+            epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
