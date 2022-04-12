@@ -1,4 +1,4 @@
-from concurrent.futures import process
+# from concurrent.futures import process
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -156,7 +156,8 @@ def main():
         if i % 100 == 0:
             print('=> Inferencing %d/%d' % (i, num_samples))
         
-        num_processes = len(sample['left_bboxes'])
+        # num_processes = len(sample['left_bboxes'])
+        num_processes = 4
         processes = []
 
         for j, bbox in enumerate(sample['left_bboxes']):
