@@ -156,8 +156,8 @@ def main():
         if i % 100 == 0:
             print('=> Inferencing %d/%d' % (i, num_samples))
         
-        # num_processes = len(sample['left_bboxes'])
-        num_processes = 4
+        num_processes = len(sample['left_bboxes'])
+        # num_processes = 4
         processes = []
 
         for j, bbox in enumerate(sample['left_bboxes']):
@@ -176,7 +176,7 @@ def main():
 
             left = sample['left'][:,:,y_min:y_max,x_min:x_max].to(device)  # [B, 3, H, W]
             right = sample['right'][:,:,y_min:y_max,x_min:x_max].to(device)
-            gt_disp = sample['disp'][:,:,y_min:y_max,x_min:x_max].to(device)
+            gt_disp = sample['disp'][:,y_min:y_max,x_min:x_max].to(device)
 
             # Pad
             # ori_height, ori_width = left.size()[2:]
