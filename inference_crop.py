@@ -134,6 +134,17 @@ def main():
         print('=> Use %d GPUs' % torch.cuda.device_count())
         aanet = torch.nn.DataParallel(aanet)
 
+    ### Prepare to calculate depth
+    from Disp2Depth import Disp2Depth
+
+    ## Camera parameters
+    K = np.array([[2301.3147, 0, 1489.8536], [0, 2301.3147, 479.1750],[0, 0, 1]]) # intrinsic matrix of apolloscape dataset
+    baseline = 0.622
+
+    ## Init disp to depth class
+    Sys = Disp2Depth(K, baseline)    
+
+
     # Inference
     aanet.eval()
 
@@ -225,6 +236,13 @@ def main():
             epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
             epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
             area += (x_max - x_min_bb)*(y_max-y_min_bb)
+
+            true_depth = Sys.disp2depth(gt_disp)
+            pred_depth = Sys.disp2depth(pred_disp_bb)
+
+            depth_err = pred_depth - true_depth
+
+            print('Mean depth error: ', depth_err.mean())
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
