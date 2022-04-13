@@ -165,7 +165,7 @@ class StereoDataset(Dataset):
         ### Bboxes
         sample['left_bboxes'] = self.bboxes(sample_path['left_bbox'], img_width, img_height)
         sample['right_bboxes'] = self.bboxes(sample_path['right_bbox'], img_width, img_height) 
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
 
         # GT disparity of subset if negative, finalpass and cleanpass is positive
         subset = True if 'subset' in self.dataset_name else False

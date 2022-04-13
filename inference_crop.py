@@ -240,7 +240,7 @@ def main():
             true_depth = Sys.disp2depth(gt_disp.cpu().numpy())
             pred_depth = Sys.disp2depth(pred_disp_bb.cpu().numpy())
 
-            depth_err = pred_depth - true_depth
+            depth_err = abs(pred_depth - true_depth)
 
             print('Mean depth error: ', depth_err.mean())
 
