@@ -147,6 +147,9 @@ def main():
         if args.count_time and i == args.num_images:  # testing time only
             break
 
+        epes = 0
+        area = 0
+
         if i % 100 == 0:
             print('=> Inferencing %d/%d' % (i, num_samples))
 
@@ -209,12 +212,19 @@ def main():
             x_min_bb = (96-crop_width%96)
             y_min_bb = (96-crop_height%96)
             pred_disp_bb = pred_disp[:, y_min_bb:, x_min_bb:]
+
+            if pred_disp_bb.mean() > 50: continue
+
+            print('Mean of predicted bbox: ', pred_disp_bb.mean())
+
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
-            import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
             thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
-            print('1-pixel error: ', thres3)
+            print('3-pixel error: ', thres3)
 
             epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
+            epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
+            area += (x_max - x_min_bb)*(y_max-y_min_bb)
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
@@ -238,7 +248,7 @@ def main():
                         skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
 
     print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
-
+    print('=> Avg EPE: ', epes/area)
 
 if __name__ == '__main__':
     main()
