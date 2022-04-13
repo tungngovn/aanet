@@ -237,8 +237,8 @@ def main():
             epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
             area += (x_max - x_min_bb)*(y_max-y_min_bb)
 
-            true_depth = Sys.disp2depth(gt_disp.cpu().numpy())
-            pred_depth = Sys.disp2depth(pred_disp_bb.cpu().numpy())
+            true_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
+            pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
 
             depth_err = abs(pred_depth - true_depth)
 
