@@ -30,7 +30,7 @@ class Disp2Depth:
 
         depth_image = np.zeros(disp_image.shape)
         depth_image = depth_image + (focal_x * baseline)
-        disp_image = disp_image/200
+        # disp_image = disp_image/200
         depth_image = np.divide(depth_image, disp_image)
 
         return depth_image

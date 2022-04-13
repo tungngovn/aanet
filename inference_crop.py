@@ -243,6 +243,7 @@ def main():
             depth_err = abs(pred_depth - true_depth)
 
             print('Mean depth error: ', depth_err.mean())
+            import pdb; pdb.set_trace()
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
