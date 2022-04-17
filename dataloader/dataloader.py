@@ -36,7 +36,8 @@ class StereoDataset(Dataset):
             'train': 'filenames/KITTI_2012_train.txt',
             'train_all': 'filenames/KITTI_2012_train_all.txt',
             'val': 'filenames/KITTI_2012_val.txt',
-            'test': 'filenames/KITTI_2012_test.txt'
+            # 'test': 'filenames/KITTI_2012_test.txt'
+            'test': 'filenames/KITTI_2012_val_one.txt'
         }
 
         kitti_2015_dict = {
@@ -119,8 +120,11 @@ class StereoDataset(Dataset):
             imgL = [img for img in left_bboxes if img_name in img['filename']]
             imgR = [img for img in right_bboxes if img_name in img['filename']]
 
-            sample['left_bbox'] = imgL[0]['objects']
-            sample['right_bbox'] = imgR[0]['objects']
+            imgL = left_bboxes[0]
+            imgR = right_bboxes[0]
+
+            sample['left_bbox'] = imgL['objects']
+            sample['right_bbox'] = imgR['objects']
 
             self.samples.append(sample)
 
