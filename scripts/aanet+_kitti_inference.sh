@@ -3,7 +3,7 @@
 # Inference on KITTI 2012 test set for submission
 CUDA_VISIBLE_DEVICES=0 python inference.py \
 --mode test \
---data_dir data/KITTI/kitti_2012/data_stereo_flow \
+--data_dir data/KITTI/KITTI2012/data_stereo_flow \
 --dataset_name KITTI2012 \
 --pretrained_aanet pretrained/aanet+_kitti12-56157808.pth \
 --batch_size 1 \
