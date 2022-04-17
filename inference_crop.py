@@ -164,6 +164,10 @@ def main():
         if i % 100 == 0:
             print('=> Inferencing %d/%d' % (i, num_samples))
 
+        left_img = sample['left'].to(device)
+        right_img = sample['right'].to(device)
+        gt_disp_img = sample['disp'].to(device)
+
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
 
