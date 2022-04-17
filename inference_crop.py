@@ -224,7 +224,7 @@ def main():
             y_min_bb = (96-crop_height%96)
             pred_disp_bb = pred_disp[:, y_min_bb:, x_min_bb:]
 
-            if pred_disp_bb.mean() > 50: continue
+            # if pred_disp_bb.mean() > 50: continue
 
             print('Mean of predicted bbox: ', pred_disp_bb.mean())
 
@@ -237,34 +237,69 @@ def main():
             epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
             area += (x_max - x_min_bb)*(y_max-y_min_bb)
 
-            true_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
-            pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
+            # true_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
+            # pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
 
-            depth_err = abs(pred_depth - true_depth)
+            # depth_err = abs(pred_depth - true_depth)
+            # print('Predicted depth: ', pred_depth.mean())
 
-            print('Mean depth error: ', depth_err.mean())
-            import pdb; pdb.set_trace()
+            # print('Mean depth error: ', depth_err.mean())
+            # import pdb; pdb.set_trace()
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
 
             for b in range(pred_disp.size(0)):
-                disp = pred_disp[b].detach().cpu().numpy()  # [H, W]
-                save_name = str(j) + '_' + sample['left_name'][b]
-                save_name = os.path.join(args.output_dir, save_name)
-                utils.check_path(os.path.dirname(save_name))
+                ## Original code
+                # disp = pred_disp[b].detach().cpu().numpy()  # [H, W]
+                # save_name = str(j) + '_' + sample['left_name'][b]
+                # save_name = os.path.join(args.output_dir, save_name)
+
+                ## Pred_disp
+                disp_pred = pred_disp[b].detach().cpu().numpy()  # [H, W]
+                save_name_pred = str(j) + '_pred_' + sample['left_name'][b]
+                save_name_pred = os.path.join(args.output_dir, save_name_pred)
+
+                ## GT disp
+                disp_gt = gt_disp[b].detach().cpu().numpy()  # [H, W]
+                save_name_gt = str(j) + '_gt_' + sample['left_name'][b]
+                save_name_gt = os.path.join(args.output_dir, save_name_gt)
+
+                # utils.check_path(os.path.dirname(save_name))
+                utils.check_path(os.path.dirname(save_name_pred))
+                utils.check_path(os.path.dirname(save_name_gt))
                 if not args.count_time:
                     if args.save_type == 'pfm':
                         if args.visualize:
-                            skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+                            # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+                            skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
+                            skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
 
-                        save_name = save_name[:-3] + 'pfm'
-                        write_pfm(save_name, disp)
+                        ## Original code
+                        # save_name = save_name[:-3] + 'pfm'
+                        # write_pfm(save_name, disp)
+
+                        ## Pred
+                        save_name_pred = save_name_pred[:-3] + 'pfm'
+                        write_pfm(save_name_pred, disp_pred)
+                        ## GT
+                        save_name_gt = save_name_gt[:-3] + 'pfm'
+                        write_pfm(save_name_gt, disp_gt)
                     elif args.save_type == 'npy':
-                        save_name = save_name[:-3] + 'npy'
-                        np.save(save_name, disp)
+                        ## Original code
+                        # save_name = save_name[:-3] + 'npy'
+                        # np.save(save_name, disp)
+
+                        ## Pred
+                        save_name_pred = save_name_pred[:-3] + 'npy'
+                        np.save(save_name_pred, disp_pred)
+
+                        save_name_gt = save_name_gt[:-3] + 'npy'
+                        np.save(save_name_gt, disp_gt)
                     else:
-                        skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+                        # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+                        skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
+                        skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
 
     print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     print('=> Avg EPE: ', epes/area)
