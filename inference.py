@@ -89,7 +89,6 @@ def main():
 
     # Test loader
     test_transform = transforms.Compose([
-        transforms.ObjCrop(),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)])
     test_data = dataloader.StereoDataset(data_dir=args.data_dir,
@@ -151,8 +150,6 @@ def main():
 
         left = sample['left'].to(device)  # [B, 3, H, W]
         right = sample['right'].to(device)
-
-        left_bboxes = sample['left_bboxes']
 
         # Pad
         ori_height, ori_width = left.size()[2:]
