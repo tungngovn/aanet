@@ -227,7 +227,7 @@ def main():
                     pred_disp = pred_disp[:, top_pad:, :-right_pad]
                 else:
                     pred_disp = pred_disp[:, top_pad:]
-            offset = int(crop_width/3)
+            offset = int(crop_width/2)-2
             x_min_bb = 96 + offset
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset
             y_min_bb = (96-crop_height%96)
@@ -280,7 +280,6 @@ def main():
                 utils.check_path(os.path.dirname(save_name_pred))
                 utils.check_path(os.path.dirname(save_name_gt))
                 if not args.count_time:
-                    import pdb; pdb.set_trace()
                     if args.save_type == 'pfm':
                         if args.visualize:
                             # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
