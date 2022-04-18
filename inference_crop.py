@@ -228,7 +228,7 @@ def main():
                 else:
                     pred_disp = pred_disp[:, top_pad:]
             x_min_bb = 96
-            x_max_bb = x_max_p - (96-crop_width%96)
+            x_max_bb = x_max_p - x_min_p - (96-crop_width%96)
             y_min_bb = (96-crop_height%96)
             pred_disp_bb = pred_disp[:, y_min_bb:, x_min_bb:x_max_bb]
 
