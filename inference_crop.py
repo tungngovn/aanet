@@ -179,11 +179,15 @@ def main():
             crop_width = x_max - x_min
             crop_height = y_max - y_min
 
-            x_min_p = x_min - (96-crop_width%96)
+            if crop_width < 50: continue
+
+            x_min_p = x_min - 96
+
+            x_max_p = x_max + (96-crop_width%96)
             y_min_p = y_min - (96-crop_height%96)
 
-            left = sample['left'][:,:,y_min_p:y_max,x_min_p:x_max].to(device)  # [B, 3, H, W]
-            right = sample['right'][:,:,y_min_p:y_max,x_min_p:x_max].to(device)
+            left = sample['left'][:,:,y_min_p:y_max,x_min_p:x_max_p].to(device)  # [B, 3, H, W]
+            right = sample['right'][:,:,y_min_p:y_max,x_min_p:x_max_p].to(device)
             gt_disp = sample['disp'][:,y_min:y_max,x_min:x_max].to(device)
 
             # Pad
@@ -223,10 +227,10 @@ def main():
                     pred_disp = pred_disp[:, top_pad:, :-right_pad]
                 else:
                     pred_disp = pred_disp[:, top_pad:]
-
-            x_min_bb = (96-crop_width%96)
+            x_min_bb = 96
+            x_max_bb = x_max_p - (96-crop_width%96)
             y_min_bb = (96-crop_height%96)
-            pred_disp_bb = pred_disp[:, y_min_bb:, x_min_bb:]
+            pred_disp_bb = pred_disp[:, y_min_bb:, x_min_bb:x_max_bb]
 
             # if pred_disp_bb.mean() > 50: continue
 
@@ -273,6 +277,7 @@ def main():
                 utils.check_path(os.path.dirname(save_name_pred))
                 utils.check_path(os.path.dirname(save_name_gt))
                 if not args.count_time:
+                    import pdb; pdb.set_trace()
                     if args.save_type == 'pfm':
                         if args.visualize:
                             # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
