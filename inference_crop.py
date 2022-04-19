@@ -276,6 +276,11 @@ def main():
                 save_name_gt = str(j) + '_gt_' + sample['left_name'][b]
                 save_name_gt = os.path.join(args.output_dir, save_name_gt)
 
+                ## Cropped left image
+                left_imge = left.detach().cpu().numpy()
+                save_name_left = str(j) + '_pred_' + sample['left_name']
+                save_name_left = os.path.join(args.output_dir, save_name_left)
+
                 # utils.check_path(os.path.dirname(save_name))
                 utils.check_path(os.path.dirname(save_name_pred))
                 utils.check_path(os.path.dirname(save_name_gt))
@@ -311,6 +316,7 @@ def main():
                         # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
                         skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
                         skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
+                        skimage.io.imsave(save_name_left, (left_imge).astype(np.uint16))
 
     print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     print('=> Avg EPE: ', epes/area)
