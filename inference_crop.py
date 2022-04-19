@@ -278,7 +278,7 @@ def main():
 
                 ## Cropped left image
                 left_imge = left.detach().cpu().numpy()
-                save_name_left = str(j) + '_pred_' + sample['left_name']
+                save_name_left = str(j) + '_pred_' + sample['left_name'][b]
                 save_name_left = os.path.join(args.output_dir, save_name_left)
 
                 # utils.check_path(os.path.dirname(save_name))
