@@ -14,6 +14,7 @@ from dataloader import transforms
 from utils import utils
 from utils.file_io import write_pfm
 
+from PIL import Image, ImageDraw
 from metric import d1_metric, thres_metric
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
@@ -277,9 +278,9 @@ def main():
                 save_name_gt = os.path.join(args.output_dir, save_name_gt)
 
                 ## Cropped left image
-                left_imge = left.detach().cpu().numpy()
-                save_name_left = str(j) + '_pred_' + sample['left_name'][b]
-                save_name_left = os.path.join(args.output_dir, save_name_left)
+                left_imge = Image.fromarray(left.detach().cpu().numpy())
+                save_name_left = str(j) + '_left_' + sample['left_name'][b]
+                save_name_left = os.path.join(args.output_dir, save_name_gt)
 
                 # utils.check_path(os.path.dirname(save_name))
                 utils.check_path(os.path.dirname(save_name_pred))
@@ -316,7 +317,7 @@ def main():
                         # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
                         skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
                         skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
-                        skimage.io.imsave(save_name_left, (left_imge).astype(np.uint16))
+                        left_imge.save(save_name_left)
 
     print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     print('=> Avg EPE: ', epes/area)
