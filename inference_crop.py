@@ -169,6 +169,21 @@ def main():
         right_img = sample['right'].to(device)
         gt_disp_img = sample['disp'].to(device)
 
+        with torch.no_grad():
+            time_start = time.perf_counter()
+            pred_disp_full = aanet(left_img, right_img)[-1]  # [B, H, W]
+            inference_time += time.perf_counter() - time_start
+        
+        print('Full image inference time: ', inference_time)
+
+        disp_pred_full = pred_disp_full.detach().cpu().numpy()  # [H, W]
+        save_name_pred = str(j) + '_pred_' + sample['left_name'][b]
+        save_name_pred = os.path.join(args.output_dir, save_name_pred)
+        skimage.io.imsave(save_name_pred, (disp_pred_full * 256.).astype(np.uint16))
+
+
+        inference_time = 0
+
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
 

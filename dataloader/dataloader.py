@@ -8,7 +8,9 @@ import os
 from utils import utils
 from utils.file_io import read_img, read_disp
 
+## Tung's edit
 import json ## add to act with bounding boxes
+from PIL import Image
 
 
 class StereoDataset(Dataset):
@@ -39,6 +41,11 @@ class StereoDataset(Dataset):
             'test': 'filenames/KITTI_2012_test.txt'
         }
 
+        kitti_2012_one_dict = {
+            'val': 'filenames/KITTI_2012_one_val.txt',
+            'test': 'filenames/KITTI_2012_one_val.txt'
+        }
+
         kitti_2015_dict = {
             'train': 'filenames/KITTI_2015_train.txt',
             'train_all': 'filenames/KITTI_2015_train_all.txt',
@@ -63,6 +70,7 @@ class StereoDataset(Dataset):
         dataset_name_dict = {
             'SceneFlow': sceneflow_finalpass_dict,
             'KITTI2012': kitti_2012_dict,
+            'KITTI20121': kitti_2012_one_dict,
             'KITTI2015': kitti_2015_dict,
             'KITTI_mix': kitti_mix_dict,
             'apolloscape': apolloscape_dict, ## Add apolloscape dataset to dataset dictionary

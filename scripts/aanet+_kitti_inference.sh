@@ -4,7 +4,7 @@
 CUDA_VISIBLE_DEVICES=0 python inference_crop.py \
 --mode test \
 --data_dir data/KITTI/KITTI2012/data_stereo_flow \
---dataset_name KITTI2012 \
+--dataset_name KITTI20121 \
 --pretrained_aanet pretrained/aanet+_kitti12-56157808.pth \
 --batch_size 1 \
 --img_height 384 \
