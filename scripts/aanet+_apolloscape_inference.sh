@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Inference on KITTI 2015 test set for submission
-CUDA_VISIBLE_DEVICES=0 python inference.py \
+# Inference on Apolloscape stereo depth estimation dataset
+CUDA_VISIBLE_DEVICES=0 python inference_apollo.py \
 --mode test \
 --data_dir data/apolloscape \
 --dataset_name apolloscape \
@@ -9,7 +9,7 @@ CUDA_VISIBLE_DEVICES=0 python inference.py \
 --batch_size 1 \
 --max_disp 192 \
 --img_height 960 \
---img_width 3130 \
+--img_width 3072 \
 --feature_type ganet \
 --feature_pyramid \
 --refinement_type hourglass \
