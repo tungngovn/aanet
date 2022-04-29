@@ -10,8 +10,6 @@ from utils.file_io import read_img, read_disp
 
 ## Tung's edit
 import json ## add to act with bounding boxes
-from PIL import Image
-
 
 class StereoDataset(Dataset):
     def __init__(self, data_dir,
@@ -70,7 +68,7 @@ class StereoDataset(Dataset):
         dataset_name_dict = {
             'SceneFlow': sceneflow_finalpass_dict,
             'KITTI2012': kitti_2012_dict,
-            'KITTI20121': kitti_2012_one_dict,
+            # 'KITTI20121': kitti_2012_one_dict,
             'KITTI2015': kitti_2015_dict,
             'KITTI_mix': kitti_mix_dict,
             'apolloscape': apolloscape_dict, ## Add apolloscape dataset to dataset dictionary
@@ -155,7 +153,6 @@ class StereoDataset(Dataset):
 
             bbox_list.append(bbox)
         return bbox_list
-        pass        
 
     def __getitem__(self, index):
         sample = {}
@@ -173,7 +170,6 @@ class StereoDataset(Dataset):
         ### Bboxes
         sample['left_bboxes'] = self.bboxes(sample_path['left_bbox'], img_width, img_height)
         sample['right_bboxes'] = self.bboxes(sample_path['right_bbox'], img_width, img_height) 
-        # import pdb; pdb.set_trace()
 
         # GT disparity of subset if negative, finalpass and cleanpass is positive
         subset = True if 'subset' in self.dataset_name else False

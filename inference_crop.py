@@ -92,7 +92,6 @@ def main():
 
     # Test loader
     test_transform = transforms.Compose([
-        # transforms.ObjCrop(args.img_height, args.img_width, validate=True),
         transforms.RandomCrop(args.img_height, args.img_width, validate=True),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)])
@@ -135,6 +134,7 @@ def main():
         print('=> Use %d GPUs' % torch.cuda.device_count())
         aanet = torch.nn.DataParallel(aanet)
 
+    '''
     ### Prepare to calculate depth
     from Disp2Depth import Disp2Depth
 
@@ -144,7 +144,7 @@ def main():
 
     ## Init disp to depth class
     Sys = Disp2Depth(K, baseline)    
-
+    '''
 
     # Inference
     aanet.eval()
@@ -195,7 +195,7 @@ def main():
             crop_width = x_max - x_min
             crop_height = y_max - y_min
 
-            if crop_width < 50: continue
+            if (crop_width < 30) and (crop_height < 30): continue ## filter small objects
 
             x_min_p = x_min - 96
 
@@ -227,7 +227,6 @@ def main():
 
             with torch.no_grad():
                 time_start = time.perf_counter()
-                # import pdb; pdb.set_trace()
                 pred_disp = aanet(left, right)[-1]  # [B, H, W]
                 inference_time += time.perf_counter() - time_start
 
@@ -243,7 +242,8 @@ def main():
                     pred_disp = pred_disp[:, top_pad:, :-right_pad]
                 else:
                     pred_disp = pred_disp[:, top_pad:]
-            offset = int(crop_width/2)-2
+            # offset = int(crop_width/2)-2
+            offset =0
             x_min_bb = 96 + offset
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset
             y_min_bb = (96-crop_height%96)
@@ -251,27 +251,15 @@ def main():
 
             gt_disp = gt_disp[:,:, offset:-offset]
 
-            # if pred_disp_bb.mean() > 50: continue
-
             print('Mean of predicted bbox: ', pred_disp_bb.mean())
 
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
-            # import pdb; pdb.set_trace()
             thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
             print('3-pixel error: ', thres3)
 
             epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
             epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
             area += (x_max - x_min_bb)*(y_max-y_min_bb)
-
-            # true_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
-            # pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
-
-            # depth_err = abs(pred_depth - true_depth)
-            # print('Predicted depth: ', pred_depth.mean())
-
-            # print('Mean depth error: ', depth_err.mean())
-            # import pdb; pdb.set_trace()
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
@@ -284,12 +272,12 @@ def main():
 
                 ## Pred_disp
                 disp_pred = pred_disp_bb[b].detach().cpu().numpy()  # [H, W]
-                save_name_pred = str(j) + '_pred_' + sample['left_name'][b]
+                save_name_pred = sample['left_name'][b][:-4] + '_' + str(j) + '.png'
                 save_name_pred = os.path.join(args.output_dir, save_name_pred)
 
                 ## GT disp
                 disp_gt = gt_disp[b].detach().cpu().numpy()  # [H, W]
-                save_name_gt = str(j) + '_gt_' + sample['left_name'][b]
+                save_name_gt = sample['left_name'][b][:-4] + '_' + str(j) + '.png'
                 save_name_gt = os.path.join(args.output_dir, save_name_gt)
 
                 # ## Cropped left image
