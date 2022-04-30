@@ -279,12 +279,12 @@ def main():
 
                 ## Pred_disp
                 disp_pred = pred_disp_bb[b].detach().cpu().numpy()  # [H, W]
-                save_name_pred = sample['left_name'][b][:-4] + '_' + str(j) + '.png'
+                save_name_pred = sample['left_name'][b][:-4] + '_pred_' + str(j) + '.png'
                 save_name_pred = os.path.join(args.output_dir, save_name_pred)
 
                 ## GT disp
                 disp_gt = gt_disp[b].detach().cpu().numpy()  # [H, W]
-                save_name_gt = sample['left_name'][b][:-4] + '_' + str(j) + '.png'
+                save_name_gt = sample['left_name'][b][:-4] + '_gt_' + str(j) + '.png'
                 save_name_gt = os.path.join(args.output_dir, save_name_gt)
 
                 # ## Cropped left image
