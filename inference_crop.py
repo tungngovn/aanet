@@ -196,6 +196,9 @@ def main():
             y_min = bbox[2]
             y_max = bbox[4]
 
+            ## eliminate objects near left and right margins
+            if (x_min < 192) or (x_max > 2938): continue
+
             crop_width = x_max - x_min
             crop_height = y_max - y_min
 
@@ -285,7 +288,7 @@ def main():
                 save_name_gt = os.path.join(args.output_dir, save_name_gt)
 
                 # ## Cropped left image
-                left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy().astype('uint8'),'RGB')
+                left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy().astype('uint16'),'RGB')
                 save_name_left = sample['left_name'][b][:-4] + '_left_' + str(j) + '.png'
                 save_name_left = os.path.join(args.output_dir, save_name_left)
 
