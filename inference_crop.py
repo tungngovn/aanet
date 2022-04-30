@@ -285,7 +285,7 @@ def main():
                 save_name_gt = os.path.join(args.output_dir, save_name_gt)
 
                 # ## Cropped left image
-                left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy())
+                left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy().astype('uint8'),'RGB')
                 save_name_left = sample['left_name'][b][:-4] + '_left_' + str(j) + '.png'
                 save_name_left = os.path.join(args.output_dir, save_name_left)
 
