@@ -247,7 +247,7 @@ def main():
                 else:
                     pred_disp = pred_disp[:, top_pad:]
             # offset = int(crop_width/2)-2
-            offset =0
+            offset = 1
             x_min_bb = 96 + offset
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset
             y_min_bb = (96-crop_height%96)
@@ -255,7 +255,7 @@ def main():
 
             gt_disp = gt_disp[:,:, offset:-offset]
 
-            print('Mean of predicted bbox: ', pred_disp_bb.mean())
+            print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
 
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
             thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
@@ -285,9 +285,9 @@ def main():
                 save_name_gt = os.path.join(args.output_dir, save_name_gt)
 
                 # ## Cropped left image
-                # left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy())
-                # save_name_left = str(j) + '_left_' + sample['left_name'][b]
-                # save_name_left = os.path.join(args.output_dir, save_name_left)
+                left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy())
+                save_name_left = sample['left_name'][b][:-4] + '_left_' + str(j) + '.png'
+                save_name_left = os.path.join(args.output_dir, save_name_left)
 
                 # utils.check_path(os.path.dirname(save_name))
                 utils.check_path(os.path.dirname(save_name_pred))
@@ -324,7 +324,7 @@ def main():
                         # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
                         skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
                         skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
-                        # left_imge.save(save_name_left)
+                        left_imge.save(save_name_left)
 
     print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     print('=> Avg EPE: ', epes/area)
