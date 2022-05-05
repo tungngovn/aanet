@@ -53,7 +53,7 @@ def disp2depth(disp_img):
 
     depth = torch.zeros(disp_img.shape)
     depth = depth + (focal_x * baseline)
-    # disp_img = disp_img/256
+    disp_img = disp_img/256
     depth = torch.div(depth.to(torch.device('cuda')), disp_img)
 
     return depth
