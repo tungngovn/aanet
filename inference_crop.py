@@ -15,7 +15,7 @@ from utils import utils
 from utils.file_io import write_pfm
 
 from PIL import Image, ImageDraw
-from metric import d1_metric, thres_metric
+from metric import d1_metric, thres_metric, dist_err
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
@@ -161,9 +161,13 @@ def main():
 
         epes = 0
         area = 0
+        dist_errs = 0
 
-        if i % 100 == 0:
-            print('=> Inferencing %d/%d' % (i, num_samples))
+        # ## Original code 
+        # if i % 100 == 0:
+        #     print('=> Inferencing %d/%d' % (i, num_samples))
+
+        print('=> Inferencing %d/%d' % (i, num_samples))
 
         '''
         ## Test full image
@@ -213,6 +217,8 @@ def main():
             right = sample['right'][:,:,y_min_p:y_max,x_min_p:x_max_p].to(device)
             gt_disp = sample['disp'][:,y_min:y_max,x_min:x_max].to(device)
 
+            print('Predict region: width = {}, height = {}'.format(left.shape[0], left.shape[1]))
+
             # Pad
             # ori_height, ori_width = left.size()[2:]
             ori_height, ori_width = sample['left'].to(device).size()[2:]
@@ -261,15 +267,22 @@ def main():
             print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
 
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
+            # 3-pixel error
             thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
             print('3-pixel error: ', thres3)
 
+            # EPE 
             epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
             epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
             area += (x_max - x_min_bb)*(y_max-y_min_bb)
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
+
+            # Distance error
+            dist_error = dist_err(pred_disp_bb, gt_disp, mask)
+            dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
+            print('Distance error: ', dist_error)
 
             for b in range(pred_disp.size(0)):
                 ## Original code
@@ -331,6 +344,7 @@ def main():
 
     print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     print('=> Avg EPE: ', epes/area)
+    print('=> Avg Distance error: ', dist_errs/area)
 
 if __name__ == '__main__':
     main()

@@ -45,3 +45,23 @@ def thres_metric(d_est, d_gt, mask, thres, use_np=False):
         mean = torch.mean(err_mask.float())
 
     return mean
+
+def disp2depth(disp_img):
+    ## Apolloscape camera parameters
+    focal_x = 2301.3147
+    baseline = 0.622
+
+    depth = np.zeros(disp_img.shape)
+    depth = depth + (focal_x * baseline)
+    # disp_img = disp_img/256
+    depth = np.divide(depth, disp_img)
+
+    return depth
+    
+
+def dist_err(d_est, d_gt, mask):
+    depth_est = disp2depth(d_est[mask])
+    depth_gt  = disp2depth(d_gt[mask])
+    depth_err = np.abs(depth_est-depth_gt)
+    mean = np.mean(depth_err)
+    return mean
