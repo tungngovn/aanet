@@ -51,10 +51,10 @@ def disp2depth(disp_img):
     focal_x = 2301.3147
     baseline = 0.622
 
-    depth = np.zeros(disp_img.shape)
+    depth = torch.zeros(disp_img.shape)
     depth = depth + (focal_x * baseline)
     # disp_img = disp_img/256
-    depth = np.divide(depth, disp_img)
+    depth = torch.divide(depth, disp_img)
 
     return depth
     
@@ -62,6 +62,6 @@ def disp2depth(disp_img):
 def dist_err(d_est, d_gt, mask):
     depth_est = disp2depth(d_est[mask])
     depth_gt  = disp2depth(d_gt[mask])
-    depth_err = np.abs(depth_est-depth_gt)
-    mean = np.mean(depth_err)
+    depth_err = torch.abs(depth_est-depth_gt)
+    mean = torch.mean(depth_err)
     return mean
