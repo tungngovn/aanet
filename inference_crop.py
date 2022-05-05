@@ -279,10 +279,7 @@ def main():
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
 
-            # Distance error
-            dist_error = dist_err((pred_disp_bb * 256.).astype(np.uint16), (gt_disp* 256.).astype(np.uint16), mask)
-            dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
-            print('Distance error: ', dist_error)
+            
 
             for b in range(pred_disp.size(0)):
                 ## Original code
@@ -342,12 +339,17 @@ def main():
                         skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
                         left_imge.save(save_name_left)
 
-        print('=> Avg EPE: ', epes/area)
-        print('=> Avg Distance error: ', dist_errs/area)
+                # Distance error
+                dist_error = dist_err((disp_pred * 256.).astype(np.uint16), (disp_gt* 256.).astype(np.uint16), mask)
+                dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
+                print('Distance error: ', dist_error)
 
-    print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
-    print('=> Avg EPE: ', epes/area)
-    print('=> Avg Distance error: ', dist_errs/area)
+        print('==> Image Avg EPE: ', epes/area)
+        print('==> Image Avg Distance error: ', dist_errs/area)
+
+    print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
+    print('===> Avg EPE: ', epes/area)
+    print('===> Avg Distance error: ', dist_errs/area)
 
 if __name__ == '__main__':
     main()
