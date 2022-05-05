@@ -54,7 +54,7 @@ def disp2depth(disp_img):
     depth = torch.zeros(disp_img.shape)
     depth = depth + (focal_x * baseline)
     # disp_img = disp_img/256
-    depth = torch.divide(depth, disp_img)
+    depth = torch.div(depth, disp_img)
 
     return depth
     
