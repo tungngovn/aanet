@@ -213,6 +213,9 @@ def main():
             ## eliminate objects near left and right margins
             if (x_min < 192) or (x_max > 2938): continue
 
+            ## Eliminate objects too far
+            if (y_min  < 96): continue
+
             crop_width = x_max - x_min
             crop_height = y_max - y_min
 
