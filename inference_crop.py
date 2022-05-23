@@ -192,6 +192,7 @@ def main():
         infer_time = 0
         '''
 
+        if len(sample['left_bboxes']) == 0: continue
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
 
@@ -255,13 +256,12 @@ def main():
                     pred_disp = pred_disp[:, top_pad:, :-right_pad]
                 else:
                     pred_disp = pred_disp[:, top_pad:]
-            # offset = int(crop_width/2)-2
+            # offset = int(crop_width/2)-4
             offset = 1
             x_min_bb = 96 + offset
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset
             y_min_bb = (96-crop_height%96)
             pred_disp_bb = pred_disp[:, y_min_bb:, x_min_bb:x_max_bb]
-            # pred_disp_bb = pred_disp
             
             gt_disp = gt_disp[:,:, offset:-offset]
 
