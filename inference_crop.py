@@ -208,6 +208,7 @@ def main():
             x_max = bbox[3]
             y_min = bbox[2]
             y_max = bbox[4]
+            print('BBox: x_min = {}, x_max = {}, y_min = {}, y_max = {}'.format(x_min, x_max, y_min, y_max))
 
             ## eliminate objects near left and right margins
             if (x_min < 192) or (x_max > 2938): continue
@@ -226,7 +227,7 @@ def main():
             right = sample['right'][:,:,y_min_p:y_max,x_min_p:x_max_p].to(device)
             gt_disp = sample['disp'][:,y_min:y_max,x_min:x_max].to(device)
 
-            print('Predict region: width = {}, height = {}'.format(left.shape[0], left.shape[1]))
+            print('Predict region: width = {}, height = {}'.format(left.shape[2], left.shape[3]))
 
             # Pad
             # ori_height, ori_width = left.size()[2:]
