@@ -261,7 +261,8 @@ def main():
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset
             y_min_bb = (96-crop_height%96)
             pred_disp_bb = pred_disp[:, y_min_bb:, x_min_bb:x_max_bb]
-
+            # pred_disp_bb = pred_disp
+            
             gt_disp = gt_disp[:,:, offset:-offset]
 
             print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
@@ -289,6 +290,7 @@ def main():
 
                 ## Pred_disp
                 disp_pred = pred_disp_bb[b].detach().cpu().numpy()  # [H, W]
+                # disp_pred = pred_disp[b].detach().cpu().numpy()  # [H, W] # full predicted region
                 save_name_pred = sample['left_name'][b][:-4] + '_pred_' + str(j) + '.png'
                 save_name_pred = os.path.join(args.output_dir, save_name_pred)
 
