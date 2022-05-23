@@ -156,6 +156,10 @@ def main():
     num_samples = len(test_loader)
     print('=> %d samples found in the test set' % num_samples)
 
+    epess = 0
+    areas = 0
+    dist_errss = 0
+
     for i, sample in enumerate(test_loader):
         if args.count_time and i == args.num_images:  # testing time only
             break
@@ -350,12 +354,16 @@ def main():
                 dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
                 print('Distance error: ', dist_error)
 
+        epess += epes
+        areas += area
+        dist_errss += dist_errs
+        if area == 0: continue
         print('==> Image Avg EPE: ', epes/area)
         print('==> Image Avg Distance error: ', dist_errs/area)
 
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
-    print('===> Avg EPE: ', epes/area)
-    print('===> Avg Distance error: ', dist_errs/area)
+    print('===> Avg EPE: ', epess/areas)
+    print('===> Avg Distance error: ', dist_errss/areas)
 
 if __name__ == '__main__':
     main()
