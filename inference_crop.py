@@ -192,6 +192,7 @@ def main():
         infer_time = 0
         '''
 
+        print("No. of bbox: ", len(sample['left_bboxes']))
         if len(sample['left_bboxes']) == 0: continue
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
