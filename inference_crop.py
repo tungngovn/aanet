@@ -199,8 +199,8 @@ def main():
 
         print("No. of bbox: ", len(sample['left_bboxes']))
         if len(sample['left_bboxes']) == 0: continue
-        if len(sample['left_bboxes']) == 1: 
-            pdb.set_trace()
+        # if len(sample['left_bboxes']) == 1: 
+        #     pdb.set_trace()
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
 
