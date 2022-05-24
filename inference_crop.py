@@ -169,10 +169,10 @@ def main():
         if args.count_time and i == args.num_images:  # testing time only
             break
 
-        csvFileName = sample['left_name'][b][:-4] + '.csv'
+        csvFileName = sample['left_name'][0][:-4] + '.csv'
         csvFileName = os.path.join(args.output_dir, csvFileName)
         
-        with open(csvFileName, 'w', filename='') as file:
+        with open(csvFileName, 'w', newline='') as file:
             csvwriter = csv.writer(file)
             csvwriter.writerow(csvHeader)
 
@@ -306,9 +306,9 @@ def main():
 
             # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', | 'GT_depth', 'PredDepth', 'DepthErr']
             data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe]
-            with open(csvFileName, 'a', filename='') as file:
+            with open(csvFileName, 'a', newline='') as file:
                 csvwriter = csv.writer(file)
-                csvwriter.writerow()
+                csvwriter.writerow(data)
             
 
 
