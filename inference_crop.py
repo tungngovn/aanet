@@ -1,3 +1,4 @@
+from fileinput import filename
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -14,9 +15,11 @@ from dataloader import transforms
 from utils import utils
 from utils.file_io import write_pfm
 
+## Tung added libraries
 import pdb
 from PIL import Image, ImageDraw
 from metric import d1_metric, thres_metric, dist_err
+import csv
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
@@ -160,9 +163,18 @@ def main():
     areas = 0
     dist_errss = 0
 
+    csvHeader = ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE']# , 'GT_depth', 'PredDepth', 'DepthErr']
+
     for i, sample in enumerate(test_loader):
         if args.count_time and i == args.num_images:  # testing time only
             break
+
+        csvFileName = sample['left_name'][b][:-4] + '.csv'
+        csvFileName = os.path.join(args.output_dir, csvFileName)
+        
+        with open(csvFileName, 'w', filename='') as file:
+            csvwriter = csv.writer(file)
+            csvwriter.writerow(csvHeader)
 
         epes = 0
         area = 0
@@ -292,7 +304,13 @@ def main():
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
 
+            # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', | 'GT_depth', 'PredDepth', 'DepthErr']
+            data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe]
+            with open(csvFileName, 'a', filename='') as file:
+                csvwriter = csv.writer(file)
+                csvwriter.writerow()
             
+
 
             for b in range(pred_disp.size(0)):
                 ## Original code
@@ -366,8 +384,8 @@ def main():
         print('==> Image Avg Distance error: ', dist_errs/area)
 
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
-    print('===> Avg EPE: ', epess/areas)
-    print('===> Avg Distance error: ', dist_errss/areas)
+    # print('===> Avg EPE: ', epess/areas)
+    # print('===> Avg Distance error: ', dist_errss/areas)
 
 if __name__ == '__main__':
     main()
