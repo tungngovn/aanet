@@ -231,6 +231,7 @@ def main():
             crop_height = y_max - y_min
 
             if (crop_width < 30) and (crop_height < 30): continue ## filter small objects
+            # if (crop_width < 10) or (crop_height < 10): continue ## filter small objects
 
             x_min_p = x_min - 96
 
@@ -280,12 +281,14 @@ def main():
                 else:
                     pred_disp = pred_disp[:, top_pad:]
 
-            offset_x = int(crop_width/2)-4
+            offset_x = int(crop_width/2)-5
+            offset_x += 1
             # offset = 1
             x_min_bb = 96 + offset_x
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset_x
 
-            offset_y = int(crop_height/2)-4
+            offset_y = int(crop_height/2)-5
+            offset_y += 1
             y_min_bb = (96-crop_height%96) + offset_y
             pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
             
