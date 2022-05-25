@@ -279,14 +279,17 @@ def main():
                     pred_disp = pred_disp[:, top_pad:, :-right_pad]
                 else:
                     pred_disp = pred_disp[:, top_pad:]
-            # offset = int(crop_width/2)-4
-            offset = 1
-            x_min_bb = 96 + offset
-            x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset
-            y_min_bb = (96-crop_height%96)
-            pred_disp_bb = pred_disp[:, y_min_bb:, x_min_bb:x_max_bb]
+
+            offset_x = int(crop_width/2)-4
+            # offset = 1
+            x_min_bb = 96 + offset_x
+            x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset_x
+
+            offset_y = int(crop_height/2)-4
+            y_min_bb = (96-crop_height%96) + offset_y
+            pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
             
-            gt_disp = gt_disp[:,:, offset:-offset]
+            gt_disp = gt_disp[:,offset_y:-offset_y, offset_x:-offset_x]
 
             print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
 
