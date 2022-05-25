@@ -25,8 +25,8 @@ class Disp2Depth:
         # baseline = 0.54
         baseline = self.baseline
 
-        print('Focal x: ', focal_x)
-        print('baseline: ', baseline)
+        # print('Focal x: ', focal_x)
+        # print('baseline: ', baseline)
 
         depth_image = np.zeros(disp_image.shape)
         depth_image = depth_image + (focal_x * baseline)
