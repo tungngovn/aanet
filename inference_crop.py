@@ -304,8 +304,8 @@ def main():
             print('EPE: ', epe)
 
             ## Calculate depth error
-            gt_depth = Sys.disp2depth(gt_disp)
-            pred_depth = Sys.disp2depth(pred_disp_bb)
+            gt_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
+            pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
 
             depth_err = abs(gt_depth - pred_depth)
             pdb.set_trace()
