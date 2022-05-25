@@ -293,8 +293,8 @@ def main():
             pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
             
             gt_disp = gt_disp[:,offset_y:-offset_y, offset_x:-offset_x]
-            if i >=38:
-                pdb.set_trace()
+            # if i >=38:
+            #     pdb.set_trace()
 
             print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
 
