@@ -311,7 +311,6 @@ def main():
             pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
 
             depth_err = abs(gt_depth - pred_depth)
-            pdb.set_trace()
             
 
             # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
