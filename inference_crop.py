@@ -162,7 +162,7 @@ def main():
     areas = 0
     dist_errss = 0
 
-    csvHeader = ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE']# , 'GT_depth', 'PredDepth', 'DepthErr']
+    csvHeader = ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
 
     for i, sample in enumerate(test_loader):
         if args.count_time and i == args.num_images:  # testing time only
@@ -314,8 +314,8 @@ def main():
             pdb.set_trace()
             
 
-            # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', | 'GT_depth', 'PredDepth', 'DepthErr']
-            data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe]
+            # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
+            data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe, gt_depth.mean(), pred_depth.mean(), depth_err.mean()]
             with open(csvFileName, 'a', newline='') as file:
                 csvwriter = csv.writer(file)
                 csvwriter.writerow(data)
