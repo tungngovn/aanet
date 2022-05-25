@@ -138,7 +138,7 @@ def main():
         print('=> Use %d GPUs' % torch.cuda.device_count())
         aanet = torch.nn.DataParallel(aanet)
 
-    '''
+    ##[=======>>>Depth<<<==================]##
     ### Prepare to calculate depth
     from Disp2Depth import Disp2Depth
 
@@ -148,7 +148,6 @@ def main():
 
     ## Init disp to depth class
     Sys = Disp2Depth(K, baseline)    
-    '''
 
     # Inference
     aanet.eval()
@@ -303,6 +302,14 @@ def main():
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
+
+            ## Calculate depth error
+            gt_depth = Sys.disp2depth(gt_disp)
+            pred_depth = Sys.disp2depth(pred_disp_bb)
+
+            depth_err = abs(gt_depth - pred_depth)
+            pdb.set_trace()
+            
 
             # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', | 'GT_depth', 'PredDepth', 'DepthErr']
             data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe]
