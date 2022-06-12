@@ -168,12 +168,12 @@ def main():
         if args.count_time and i == args.num_images:  # testing time only
             break
 
-        csvFileName = sample['left_name'][0][:-4] + '.csv'
-        csvFileName = os.path.join(args.output_dir, csvFileName)
+        # csvFileName = sample['left_name'][0][:-4] + '.csv'
+        # csvFileName = os.path.join(args.output_dir, csvFileName)
         
-        with open(csvFileName, 'w', newline='') as file:
-            csvwriter = csv.writer(file)
-            csvwriter.writerow(csvHeader)
+        # with open(csvFileName, 'w', newline='') as file:
+        #     csvwriter = csv.writer(file)
+        #     csvwriter.writerow(csvHeader)
 
         epes = 0
         area = 0
@@ -319,10 +319,10 @@ def main():
             
 
             # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
-            data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe, gt_depth.mean(), pred_depth.mean(), depth_err.mean()]
-            with open(csvFileName, 'a', newline='') as file:
-                csvwriter = csv.writer(file)
-                csvwriter.writerow(data)
+            # data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe, gt_depth.mean(), pred_depth.mean(), depth_err.mean()]
+            # with open(csvFileName, 'a', newline='') as file:
+            #     csvwriter = csv.writer(file)
+            #     csvwriter.writerow(data)
             
 
 

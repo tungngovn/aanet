@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON=${PYTHON:-"python"}
+PYTHON=${PYTHON:-"python3.6"}
 
 if [ -d "build" ]; then
     rm -r build
