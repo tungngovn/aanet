@@ -296,7 +296,7 @@ def main():
             # if i >=38:
             #     pdb.set_trace()
 
-            print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
+            # print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
 
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
             # 3-pixel error
