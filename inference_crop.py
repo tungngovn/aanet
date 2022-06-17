@@ -395,7 +395,7 @@ def main():
         dist_errss += dist_errs
         if area == 0: continue
         print('==> Image Avg EPE: ', epes/area)
-        print('==> Image Avg Distance error: ', dist_errs/area)
+        # print('==> Image Avg Distance error: ', dist_errs/area)
 
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     # print('===> Avg EPE: ', epess/areas)
