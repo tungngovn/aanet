@@ -170,7 +170,7 @@ def main():
         if args.count_time and i == args.num_images:  # testing time only
             break
 
-        csvFileName = sample['left_name'][0][:-4] + '_8x8.csv'
+        csvFileName = sample['left_name'][0][:-4] + '_12x12.csv'
         csvFileName = os.path.join(args.output_dir, csvFileName)
         
         with open(csvFileName, 'w', newline='') as file:
@@ -280,13 +280,13 @@ def main():
                 else:
                     pred_disp = pred_disp[:, top_pad:]
 
-            offset_x = int(crop_width/2-4)
+            offset_x = int(crop_width/2-6)
             if offset_x <=0: offset_x = 1
             # offset = 1
             x_min_bb = 96 + offset_x
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset_x
 
-            offset_y = int(crop_height/2-4)
+            offset_y = int(crop_height/2-6)
             if offset_y <=0:  offset_y = 1
             y_min_bb = (96-crop_height%96) + offset_y
             pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
@@ -296,6 +296,7 @@ def main():
             #     pdb.set_trace()
 
             # print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
+            print('ROI shape: ', pred_disp_bb.shape)
 
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
             # 3-pixel error
