@@ -343,11 +343,11 @@ def main():
 
             ## Median
             # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
-            data_median = [j, x_min, x_max, y_min, y_max, gt_disp.median(), pred_disp_bb.median(), epe, gt_depth.median(), pred_depth.median(), depth_err.median()]
+            data_median = [j, x_min, x_max, y_min, y_max, np.median(gt_disp), np.median(pred_disp_bb), epe, np.median(gt_depth), np.median(pred_depth), np.median(depth_err)]
             with open(csvFileName_median, 'a', newline='') as file:
                 csvwriter_median = csv.writer(file)
                 csvwriter_median.writerow(data_median)
-            wandb.log({'id': j,'GTDispMedian': gt_disp.median(), 'PredDispMedian': pred_disp_bb.median(), 'EPE': epe, 'GTDepthMedian': gt_depth.median(), 'PredDepthMedian': pred_depth.median(), 'DepthErrMedian': depth_err.median()})
+            wandb.log({'id': j,'GTDispMedian': np.median(gt_disp), 'PredDispMedian': np.median(pred_disp_bb), 'EPE': epe, 'GTDepthMedian': np.median(gt_depth), 'PredDepthMedian': np.median(pred_depth), 'DepthErrMedian': np.median(depth_err)})
             
 
 
