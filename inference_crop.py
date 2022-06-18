@@ -85,6 +85,8 @@ args.output_dir = os.path.join(args.output_dir, model_dir + '-' + model_name)
 utils.check_path(args.output_dir)
 utils.save_command(args.output_dir)
 
+wandb.init(project='AANet+', entity='tung', config=args)
+
 
 def main():
     # For reproducibility
@@ -163,6 +165,8 @@ def main():
     epess = 0
     areas = 0
     dist_errss = 0
+
+    wandb.watch(aanet)
 
     csvHeader = ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
 
@@ -323,6 +327,7 @@ def main():
             with open(csvFileName, 'a', newline='') as file:
                 csvwriter = csv.writer(file)
                 csvwriter.writerow(data)
+            wandb.log({'id': j,'GT_disp': gt_disp.mean(), 'PredDisp': pred_disp_bb.mean(), 'EPE': epe, 'GT_depth': gt_depth.mean(), 'PredDepth': pred_depth.mean(), 'DepthErr': depth_err.mean()})
             
 
 
@@ -396,6 +401,7 @@ def main():
         if area == 0: continue
         print('==> Image Avg EPE: ', epes/area)
         print('==> Image Avg Distance error: ', dist_errs/area)
+        wandb.log({'img_number': i,'Avg EPE': epes/area, 'Avg Distance error': dist_errs/area})
 
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     print('===> Avg EPE: ', epess/areas)
