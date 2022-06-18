@@ -170,16 +170,27 @@ def main():
 
     csvHeader = ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
 
+    csvHeader_median = ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
+
     for i, sample in enumerate(test_loader):
         if args.count_time and i == args.num_images:  # testing time only
             break
 
+        ## Mean
         csvFileName = sample['left_name'][0][:-4] + '_12x12.csv'
         csvFileName = os.path.join(args.output_dir, csvFileName)
         
         with open(csvFileName, 'w', newline='') as file:
             csvwriter = csv.writer(file)
             csvwriter.writerow(csvHeader)
+
+        ## Median
+        csvFileName_median = sample['left_name'][0][:-4] + '_median_12x12.csv'
+        csvFileName_median = os.path.join(args.output_dir, csvFileName_median)
+        
+        with open(csvFileName_median, 'w', newline='') as file:
+            csvwriter_median = csv.writer(file)
+            csvwriter_median.writerow(csvHeader_median)
 
         epes = 0
         area = 0
@@ -322,12 +333,21 @@ def main():
             depth_err = abs(gt_depth - pred_depth)
             
 
+            ## Mean
             # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
             data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe, gt_depth.mean(), pred_depth.mean(), depth_err.mean()]
             with open(csvFileName, 'a', newline='') as file:
                 csvwriter = csv.writer(file)
                 csvwriter.writerow(data)
-            wandb.log({'id': j,'GT_disp': gt_disp.mean(), 'PredDisp': pred_disp_bb.mean(), 'EPE': epe, 'GT_depth': gt_depth.mean(), 'PredDepth': pred_depth.mean(), 'DepthErr': depth_err.mean()})
+            wandb.log({'id': j,'GTDispMean': gt_disp.mean(), 'PredDispMean': pred_disp_bb.mean(), 'EPE': epe, 'GTDepthMean': gt_depth.mean(), 'PredDepthMean': pred_depth.mean(), 'DepthErrMean': depth_err.mean()})
+
+            ## Median
+            # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
+            data_median = [j, x_min, x_max, y_min, y_max, gt_disp.median(), pred_disp_bb.median(), epe, gt_depth.median(), pred_depth.median(), depth_err.median()]
+            with open(csvFileName_median, 'a', newline='') as file:
+                csvwriter_median = csv.writer(file)
+                csvwriter_median.writerow(data_median)
+            wandb.log({'id': j,'GTDispMedian': gt_disp.median(), 'PredDispMedian': pred_disp_bb.median(), 'EPE': epe, 'GTDepthMedian': gt_depth.median(), 'PredDepthMedian': pred_depth.median(), 'DepthErrMedian': depth_err.median()})
             
 
 
