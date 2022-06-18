@@ -20,6 +20,8 @@ import pdb
 from PIL import Image, ImageDraw
 from metric import d1_metric, thres_metric, dist_err
 import csv
+import wandb
+wandb.login()
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
@@ -168,7 +170,7 @@ def main():
         if args.count_time and i == args.num_images:  # testing time only
             break
 
-        csvFileName = sample['left_name'][0][:-4] + '.csv'
+        csvFileName = sample['left_name'][0][:-4] + '10x10.csv'
         csvFileName = os.path.join(args.output_dir, csvFileName)
         
         with open(csvFileName, 'w', newline='') as file:
@@ -281,13 +283,13 @@ def main():
                 else:
                     pred_disp = pred_disp[:, top_pad:]
 
-            offset_x = int(crop_width/2-5)
+            offset_x = int(crop_width/2-6)
             if offset_x <=0: offset_x = 1
             # offset = 1
             x_min_bb = 96 + offset_x
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset_x
 
-            offset_y = int(crop_height/2-5)
+            offset_y = int(crop_height/2-6)
             if offset_y <=0:  offset_y = 1
             y_min_bb = (96-crop_height%96) + offset_y
             pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
@@ -394,12 +396,12 @@ def main():
         areas += area
         dist_errss += dist_errs
         if area == 0: continue
-        print('==> Image Avg EPE: ', epes/area)
+        # print('==> Image Avg EPE: ', epes/area)
         # print('==> Image Avg Distance error: ', dist_errs/area)
 
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
-    # print('===> Avg EPE: ', epess/areas)
-    # print('===> Avg Distance error: ', dist_errss/areas)
+    print('===> Avg EPE: ', epess/areas)
+    print('===> Avg Distance error: ', dist_errss/areas)
 
 if __name__ == '__main__':
     main()
