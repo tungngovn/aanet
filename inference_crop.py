@@ -353,7 +353,7 @@ def main():
 
             ### Median csv file
             ### ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
-            data_median = [j, x_min, x_max, y_min, y_max, float(gt_disp_np.median()), float(pred_disp_np.median()), float(epe_np), np.median(gt_depth), np.median(pred_depth), np.median(depth_err)]
+            data_median = [j, x_min, x_max, y_min, y_max, float(np.median(gt_disp_np)), float(np.median(pred_disp_np.median)), float(epe_np), np.median(gt_depth), np.median(pred_depth), np.median(depth_err)]
             with open(csvFileName_median, 'a', newline='') as file:
                 csvwriter_median = csv.writer(file)
                 csvwriter_median.writerow(data_median)
