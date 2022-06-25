@@ -230,7 +230,7 @@ def main():
         if len(sample['left_bboxes']) == 0: continue
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
-            num_bbox += 1
+            
 
             x_min = bbox[1]
             x_max = bbox[3]
@@ -278,6 +278,7 @@ def main():
                         aanet(left, right)
 
             num_imgs += left.size(0)
+            num_bbox += 1
 
             with torch.no_grad():
                 time_start = time.perf_counter()
