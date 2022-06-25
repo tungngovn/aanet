@@ -425,7 +425,7 @@ def main():
         # areas += area
         dist_errss += dist_errs
         pdb.set_trace()
-        if area == 0: continue
+        # if area == 0: continue
         # print('==> Image Avg EPE: ', epes/area)
         print('==> Image Avg EPE: ', epes/num_bbox)
         # print('==> Image Avg Distance error: ', dist_errs/area)
