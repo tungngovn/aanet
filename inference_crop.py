@@ -162,9 +162,9 @@ def main():
     num_samples = len(test_loader)
     print('=> %d samples found in the test set' % num_samples)
 
-    epess = 0
+    epess = np.array([0])
     areas = 0
-    dist_errss = 0
+    dist_errss = np.array([0])
 
     wandb.watch(aanet)
 
@@ -421,9 +421,9 @@ def main():
                 # print('Distance error: ', dist_error)
                 # print('Distance error: ', dist_error)
         if num_bbox == 0: continue
-        epess += epes
+        epess.stack(epess, epes)
         # areas += area
-        dist_errss += dist_errs
+        dist_errss.stack(dist_errss,dist_errs)
         # pdb.set_trace()
         # if area == 0: continue
         # print('==> Image Avg EPE: ', epes/area)
@@ -436,8 +436,8 @@ def main():
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     # print('===> Avg EPE: ', epess/areas)
     # print('===> Avg Distance error: ', dist_errss/areas)
-    print('===> Avg EPE: ', epess/num_imgs)
-    print('===> Avg Distance error: ', dist_errss/num_imgs)
+    print('===> Avg EPE: ', epess.mean())
+    print('===> Avg Distance error: ', dist_errss.mean())
 
 if __name__ == '__main__':
     main()
