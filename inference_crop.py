@@ -333,7 +333,7 @@ def main():
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
-            pdb.set_trace()
+            # pdb.set_trace()
 
             if not (epe < 384): continue
             num_imgs += left.size(0)
