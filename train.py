@@ -130,7 +130,6 @@ def main():
     train_loader = DataLoader(dataset=train_data, batch_size=args.batch_size, shuffle=True,
                               num_workers=args.num_workers, pin_memory=True, drop_last=True)
 
-    import pdb; pdb.set_trace()
 
     # Validation loader
     val_transform_list = [transforms.RandomCrop(args.val_img_height, args.val_img_width, validate=True),
