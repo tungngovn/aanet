@@ -176,16 +176,16 @@ def main():
         if args.count_time and i == args.num_images:  # testing time only
             break
 
-        ## Mean
-        csvFileName = sample['left_name'][0][:-4] + '_12x12.csv'
+        ### Mean csv file initialization
+        csvFileName = sample['left_name'][0][:-4] + '_4x4.csv'
         csvFileName = os.path.join(args.output_dir, csvFileName)
         
         with open(csvFileName, 'w', newline='') as file:
             csvwriter = csv.writer(file)
             csvwriter.writerow(csvHeader)
 
-        ## Median
-        csvFileName_median = sample['left_name'][0][:-4] + '_median_12x12.csv'
+        ### Median csv file initialization
+        csvFileName_median = sample['left_name'][0][:-4] + '_median_4x4.csv'
         csvFileName_median = os.path.join(args.output_dir, csvFileName_median)
         
         with open(csvFileName_median, 'w', newline='') as file:
@@ -229,25 +229,24 @@ def main():
         print("No. of bbox: ", len(sample['left_bboxes']))
         if len(sample['left_bboxes']) == 0: continue
         for j, bbox in enumerate(sample['left_bboxes']):
-            ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
+            ### bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
             
-
             x_min = bbox[1]
             x_max = bbox[3]
             y_min = bbox[2]
             y_max = bbox[4]
             # print('BBox: x_min = {}, x_max = {}, y_min = {}, y_max = {}'.format(x_min, x_max, y_min, y_max))
 
-            ## eliminate objects near left and right margins
+            ### Eliminate objects near left and right margins
             if (x_min < 192) or (x_max > 2938): continue
 
-            ## Eliminate objects too far
+            ### Eliminate objects too far
             if (y_min  < 96): continue
 
             crop_width = x_max - x_min
             crop_height = y_max - y_min
 
-            if (crop_width < 30) and (crop_height < 30): continue ## filter small objects
+            if (crop_width < 30) and (crop_height < 30): continue ### filter small objects
 
             x_min_p = x_min - 96
 
@@ -297,65 +296,64 @@ def main():
                 else:
                     pred_disp = pred_disp[:, top_pad:]
 
-            offset_x = int(crop_width/2-4)
+            ### Region of Interest
+            offset_x = int(crop_width/2-2)
             if offset_x <=0: offset_x = 1
             # offset = 1
             x_min_bb = 96 + offset_x
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset_x
 
-            offset_y = int(crop_height/2-4)
+            offset_y = int(crop_height/2-2)
             if offset_y <=0:  offset_y = 1
             y_min_bb = (96-crop_height%96) + offset_y
             pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
             
             gt_disp = gt_disp[:,offset_y:-offset_y, offset_x:-offset_x]
-            # if i >=38:
-            #     pdb.set_trace()
 
             # print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
             # print('ROI shape: ', pred_disp_bb.shape)
 
+            ### ==>> Evaluation <<==###
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
-            # 3-pixel error
+
+            ### 3-pixel error
             thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
             print('3-pixel error: ', thres3)
 
-            
-
-            # EPE 
+            ### EPE 
             epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
             # epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
             # area += (x_max - x_min_bb)*(y_max-y_min_bb)
             if torch.isnan(epe): continue
             epes += epe
-            
-
-
-            # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
-            # pdb.set_trace()
 
-            # if not (epe < 384): continue
+            ### Counting images and bounding boxes
             num_imgs += left.size(0)
             num_bbox += 1
-            ## Calculate depth error
+
+            ### Calculate depth error
             gt_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
             pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
-
             depth_err = abs(gt_depth - pred_depth)
             
+            ### Convert from torch to numpy
+            gt_disp_np = gt_disp.detach().cpu().numpy()
+            pred_disp_np = pred_disp_bb.detach().cpu().numpy()
+            epe_np = epe.detach().cpu().numpy()
 
-            ## Mean
-            # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
-            data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe, gt_depth.mean(), pred_depth.mean(), depth_err.mean()]
+            ### Mean csv file
+            ### ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
+            data = [j, x_min, x_max, y_min, y_max, float(gt_disp_np.mean()), float(pred_disp_np.mean()), float(epe_np), gt_depth.mean(), pred_depth.mean(), depth_err.mean()]
+
             with open(csvFileName, 'a', newline='') as file:
                 csvwriter = csv.writer(file)
                 csvwriter.writerow(data)
             wandb.log({'id': j,'GTDispMean': gt_disp.mean(), 'PredDispMean': pred_disp_bb.mean(), 'EPE': epe, 'GTDepthMean': gt_depth.mean(), 'PredDepthMean': pred_depth.mean(), 'DepthErrMean': depth_err.mean()})
 
-            ## Median
-            # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
-            data_median = [j, x_min, x_max, y_min, y_max, gt_disp.median(), pred_disp_bb.median(), epe, np.median(gt_depth), np.median(pred_depth), np.median(depth_err)]
+            ### Median csv file
+            ### ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
+            data_median = [j, x_min, x_max, y_min, y_max, float(gt_disp_np.median()), float(pred_disp_np.median()), float(epe_np), np.median(gt_depth), np.median(pred_depth), np.median(depth_err)]
             with open(csvFileName_median, 'a', newline='') as file:
                 csvwriter_median = csv.writer(file)
                 csvwriter_median.writerow(data_median)
@@ -422,12 +420,13 @@ def main():
                         skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
                         left_imge.save(save_name_left)
 
-                # Distance error
+                ### Distance error
                 dist_error = dist_err((disp_pred * 256.).astype(np.uint16), (disp_gt* 256.).astype(np.uint16), mask.detach().cpu().numpy())
                 # dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
                 dist_errs += dist_error
                 # print('Distance error: ', dist_error)
-                # print('Distance error: ', dist_error)
+
+        ### Summary of image        
         if num_bbox == 0: continue
         epess = np.append(epess, epes.detach().cpu().numpy().astype(float))
         # areas += area

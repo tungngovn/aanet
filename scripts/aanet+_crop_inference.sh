@@ -14,5 +14,5 @@ CUDA_VISIBLE_DEVICES=0 python inference_crop.py \
 --feature_pyramid \
 --refinement_type hourglass \
 --no_intermediate_supervision \
---output_dir output/apolloscape/offset_images_12x12
+--output_dir output/apolloscape/offset_images_4x4
 
