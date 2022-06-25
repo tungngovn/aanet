@@ -195,6 +195,7 @@ def main():
         epes = 0
         area = 0
         dist_errs = 0
+        num_bbox = 0
 
         # ## Original code 
         # if i % 100 == 0:
@@ -229,6 +230,7 @@ def main():
         if len(sample['left_bboxes']) == 0: continue
         for j, bbox in enumerate(sample['left_bboxes']):
             ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
+            num_bbox += 1
 
             x_min = bbox[1]
             x_max = bbox[3]
@@ -414,25 +416,26 @@ def main():
                 # Distance error
                 dist_error = dist_err((disp_pred * 256.).astype(np.uint16), (disp_gt* 256.).astype(np.uint16), mask.detach().cpu().numpy())
                 # dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
-                dist_errs += dist_error
-                print('Distance error: ', dist_error)
+                dist_errs += depth_err
+                # print('Distance error: ', dist_error)
+                print('Distance error: ', depth_err)
 
         epess += epes
         # areas += area
-        # dist_errss += dist_errs
+        dist_errss += dist_errs
         if area == 0: continue
         # print('==> Image Avg EPE: ', epes/area)
-        print('==> Image Avg EPE: ', epes/num_imgs)
+        print('==> Image Avg EPE: ', epes/num_bbox)
         # print('==> Image Avg Distance error: ', dist_errs/area)
-        print('==> Image Avg Distance error: ', dist_errs/num_imgs)
+        print('==> Image Avg Distance error: ', dist_errs/num_bbox)
         # wandb.log({'img_number': i,'Avg EPE': epes/area, 'Avg Distance error': dist_errs/area})
-        wandb.log({'img_number': i,'Avg EPE': epes/num_imgs, 'Avg Distance error': dist_errs/num_imgs})
+        wandb.log({'img_number': i,'Avg EPE': epes/num_bbox, 'Avg Distance error': dist_errs/num_bbox})
 
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     # print('===> Avg EPE: ', epess/areas)
     # print('===> Avg Distance error: ', dist_errss/areas)
-    print('===> Avg EPE: ', epes/num_imgs)
-    print('===> Avg Distance error: ', dist_errs/num_imgs)
+    print('===> Avg EPE: ', epess/num_imgs)
+    print('===> Avg Distance error: ', dist_errss/num_imgs)
 
 if __name__ == '__main__':
     main()
