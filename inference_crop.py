@@ -420,7 +420,7 @@ def main():
                 dist_errs += dist_error
                 # print('Distance error: ', dist_error)
                 print('Distance error: ', dist_error)
-        if num_bbox == 0: pdb.set_trace()
+        if num_bbox == 0: continue
         epess += epes
         # areas += area
         dist_errss += dist_errs
