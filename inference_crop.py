@@ -423,7 +423,7 @@ def main():
         if num_bbox == 0: continue
         epess = np.append(epess, epes.detach().cpu().numpy().astype(float))
         # areas += area
-        dist_errss = np.concatenate((dist_errss,dist_errs))
+        dist_errss = np.append(dist_errss,dist_errs)
         # pdb.set_trace()
         # if area == 0: continue
         # print('==> Image Avg EPE: ', epes/area)
