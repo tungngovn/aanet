@@ -277,8 +277,7 @@ def main():
                     for _ in range(10):
                         aanet(left, right)
 
-            num_imgs += left.size(0)
-            num_bbox += 1
+            
 
             with torch.no_grad():
                 time_start = time.perf_counter()
@@ -330,6 +329,9 @@ def main():
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
 
+            if not (epe < 384): continue
+            num_imgs += left.size(0)
+            num_bbox += 1
             ## Calculate depth error
             gt_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
             pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
