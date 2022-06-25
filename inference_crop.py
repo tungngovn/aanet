@@ -421,7 +421,7 @@ def main():
                 # print('Distance error: ', dist_error)
                 # print('Distance error: ', dist_error)
         if num_bbox == 0: continue
-        epess = np.concatenate((epess, epes))
+        epess = np.concatenate((epess, epes.detach().cpu().numpy().astype('float')))
         # areas += area
         dist_errss = np.concatenate((dist_errss,dist_errs))
         # pdb.set_trace()
