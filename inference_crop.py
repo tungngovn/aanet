@@ -421,9 +421,9 @@ def main():
                 # print('Distance error: ', dist_error)
                 # print('Distance error: ', dist_error)
         if num_bbox == 0: continue
-        epess = np.stack(epess, epes)
+        epess = np.concatenate(epess, epes)
         # areas += area
-        dist_errss = np.stack(dist_errss,dist_errs)
+        dist_errss = np.concatenate(dist_errss,dist_errs)
         # pdb.set_trace()
         # if area == 0: continue
         # print('==> Image Avg EPE: ', epes/area)
