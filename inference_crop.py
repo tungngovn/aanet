@@ -320,6 +320,8 @@ def main():
             thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
             print('3-pixel error: ', thres3)
 
+            pdb.set_trace()
+
             # EPE 
             epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
             # epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
