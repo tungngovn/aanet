@@ -297,13 +297,13 @@ def main():
                 else:
                     pred_disp = pred_disp[:, top_pad:]
 
-            offset_x = int(crop_width/2-6)
+            offset_x = int(crop_width/2-4)
             if offset_x <=0: offset_x = 1
             # offset = 1
             x_min_bb = 96 + offset_x
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset_x
 
-            offset_y = int(crop_height/2-6)
+            offset_y = int(crop_height/2-4)
             if offset_y <=0:  offset_y = 1
             y_min_bb = (96-crop_height%96) + offset_y
             pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
@@ -335,7 +335,7 @@ def main():
             print('EPE: ', epe)
             # pdb.set_trace()
 
-            if not (epe < 384): continue
+            # if not (epe < 384): continue
             num_imgs += left.size(0)
             num_bbox += 1
             ## Calculate depth error
