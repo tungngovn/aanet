@@ -421,9 +421,9 @@ def main():
                 # print('Distance error: ', dist_error)
                 # print('Distance error: ', dist_error)
         if num_bbox == 0: continue
-        epess.stack(epess, epes)
+        epess = np.stack(epess, epes)
         # areas += area
-        dist_errss.stack(dist_errss,dist_errs)
+        dist_errss = np.stack(dist_errss,dist_errs)
         # pdb.set_trace()
         # if area == 0: continue
         # print('==> Image Avg EPE: ', epes/area)
@@ -433,6 +433,8 @@ def main():
         # wandb.log({'img_number': i,'Avg EPE': epes/area, 'Avg Distance error': dist_errs/area})
         wandb.log({'img_number': i,'Avg EPE': epes/num_bbox, 'Avg Distance error': dist_errs/num_bbox})
     pdb.set_trace()
+    np.delete(epess, 0)
+    np.delete(dist_errss, 0)
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     # print('===> Avg EPE: ', epess/areas)
     # print('===> Avg Distance error: ', dist_errss/areas)
