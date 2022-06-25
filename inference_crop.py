@@ -326,7 +326,9 @@ def main():
             epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
             # epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
             # area += (x_max - x_min_bb)*(y_max-y_min_bb)
+            if torch.isnan(epe): continue
             epes += epe
+            
 
 
             # d1 = d1_metric(pred_disp, gt_disp, mask)
