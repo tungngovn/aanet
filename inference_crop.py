@@ -320,7 +320,7 @@ def main():
             thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
             print('3-pixel error: ', thres3)
 
-            pdb.set_trace()
+            
 
             # EPE 
             epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
@@ -328,8 +328,10 @@ def main():
             # area += (x_max - x_min_bb)*(y_max-y_min_bb)
             epes += epe
 
+
             # d1 = d1_metric(pred_disp, gt_disp, mask)
             print('EPE: ', epe)
+            pdb.set_trace()
 
             if not (epe < 384): continue
             num_imgs += left.size(0)
