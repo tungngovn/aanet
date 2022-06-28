@@ -20,6 +20,8 @@ import pdb
 from PIL import Image, ImageDraw
 from metric import d1_metric, thres_metric, dist_err
 import csv
+import wandb
+wandb.login()
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
@@ -83,6 +85,7 @@ args.output_dir = os.path.join(args.output_dir, model_dir + '-' + model_name)
 utils.check_path(args.output_dir)
 utils.save_command(args.output_dir)
 
+wandb.init(project='AANet+', entity='nttung1cmc', config=args)
 
 def main():
     # For reproducibility
@@ -158,26 +161,20 @@ def main():
     num_samples = len(test_loader)
     print('=> %d samples found in the test set' % num_samples)
 
-    epess = 0
+    epess = np.array([0])
     areas = 0
-    dist_errss = 0
+    dist_errss = np.array([0])
 
-    csvHeader = ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
+    wandb.watch(aanet)
 
     for i, sample in enumerate(test_loader):
         if args.count_time and i == args.num_images:  # testing time only
             break
 
-        # csvFileName = sample['left_name'][0][:-4] + '.csv'
-        # csvFileName = os.path.join(args.output_dir, csvFileName)
-        
-        # with open(csvFileName, 'w', newline='') as file:
-        #     csvwriter = csv.writer(file)
-        #     csvwriter.writerow(csvHeader)
-
         epes = 0
         area = 0
         dist_errs = 0
+        num_bbox = 0
 
         # ## Original code 
         # if i % 100 == 0:
@@ -185,53 +182,27 @@ def main():
 
         print('=> Inferencing %d/%d' % (i, num_samples))
 
-        '''
-        ## Test full image
-        left_img = sample['left'].to(device)
-        right_img = sample['right'].to(device)
-        gt_disp_img = sample['disp'].to(device)
-
-        infer_time = 0
-
-        with torch.no_grad():
-            time_start = time.perf_counter()
-            pred_disp_full = aanet(left_img, right_img)[-1]  # [B, H, W]
-            infer_time += time.perf_counter() - time_start
-        
-        print('Full image inference time: ', infer_time)
-
-        disp_pred_full = pred_disp_full.detach().cpu().numpy()  # [H, W]
-        save_name_pred = str(j) + '_pred_' + sample['left_name'][b]
-        save_name_pred = os.path.join(args.output_dir, save_name_pred)
-        skimage.io.imsave(save_name_pred, (disp_pred_full * 256.).astype(np.uint16))
-
-        infer_time = 0
-        '''
-
         print("No. of bbox: ", len(sample['left_bboxes']))
         if len(sample['left_bboxes']) == 0: continue
-        # if len(sample['left_bboxes']) == 1: 
-        #     pdb.set_trace()
         for j, bbox in enumerate(sample['left_bboxes']):
-            ## bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
-
+            ### bbox: [<class>, <x_min>, <y_min>, <x_max>, <y_max>]
+            
             x_min = bbox[1]
             x_max = bbox[3]
             y_min = bbox[2]
             y_max = bbox[4]
-            print('BBox: x_min = {}, x_max = {}, y_min = {}, y_max = {}'.format(x_min, x_max, y_min, y_max))
+            # print('BBox: x_min = {}, x_max = {}, y_min = {}, y_max = {}'.format(x_min, x_max, y_min, y_max))
 
-            ## eliminate objects near left and right margins
+            ### Eliminate objects near left and right margins
             if (x_min < 192) or (x_max > 2938): continue
 
-            ## Eliminate objects too far
+            ### Eliminate objects too far
             if (y_min  < 96): continue
 
             crop_width = x_max - x_min
             crop_height = y_max - y_min
 
-            if (crop_width < 30) and (crop_height < 30): continue ## filter small objects
-            # if (crop_width < 10) or (crop_height < 10): continue ## filter small objects
+            if (crop_width < 30) and (crop_height < 30): continue ### filter small objects
 
             x_min_p = x_min - 96
 
@@ -242,7 +213,7 @@ def main():
             right = sample['right'][:,:,y_min_p:y_max,x_min_p:x_max_p].to(device)
             gt_disp = sample['disp'][:,y_min:y_max,x_min:x_max].to(device)
 
-            print('Predict region: width = {}, height = {}'.format(left.shape[2], left.shape[3]))
+            # print('Predict region: width = {}, height = {}'.format(left.shape[2], left.shape[3]))
 
             # Pad
             # ori_height, ori_width = left.size()[2:]
@@ -261,7 +232,7 @@ def main():
                     for _ in range(10):
                         aanet(left, right)
 
-            num_imgs += left.size(0)
+            
 
             with torch.no_grad():
                 time_start = time.perf_counter()
@@ -281,50 +252,51 @@ def main():
                 else:
                     pred_disp = pred_disp[:, top_pad:]
 
-            offset_x = int(crop_width/2-5)
+            ### Region of Interest
+            offset_x = int(crop_width/2-8)
             if offset_x <=0: offset_x = 1
             # offset = 1
             x_min_bb = 96 + offset_x
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset_x
 
-            offset_y = int(crop_height/2-5)
+            offset_y = int(crop_height/2-8)
             if offset_y <=0:  offset_y = 1
             y_min_bb = (96-crop_height%96) + offset_y
             pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
             
             gt_disp = gt_disp[:,offset_y:-offset_y, offset_x:-offset_x]
-            # if i >=38:
-            #     pdb.set_trace()
 
-            print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
+            # print('Mean disparity of predicted bbox: ', pred_disp_bb.mean())
+            # print('ROI shape: ', pred_disp_bb.shape)
 
+            ### ==>> Evaluation <<==###
             mask = (gt_disp > 0) & (gt_disp < args.max_disp)
-            # 3-pixel error
+
+            ### 3-pixel error
             thres3 = thres_metric(pred_disp_bb, gt_disp, mask, 3.0)
             print('3-pixel error: ', thres3)
 
-            # EPE 
+            ### EPE 
             epe = F.l1_loss(gt_disp[mask], pred_disp_bb[mask], reduction='mean')
-            epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
-            area += (x_max - x_min_bb)*(y_max-y_min_bb)
-
-            # d1 = d1_metric(pred_disp, gt_disp, mask)
+            # epes += epe*(x_max - x_min_bb)*(y_max-y_min_bb)
+            # area += (x_max - x_min_bb)*(y_max-y_min_bb)
+            if torch.isnan(epe): continue
+            epes += epe
             print('EPE: ', epe)
 
-            ## Calculate depth error
+            ### Counting images and bounding boxes
+            num_imgs += left.size(0)
+            num_bbox += 1
+
+            ### Calculate depth error
             gt_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
             pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
-
             depth_err = abs(gt_depth - pred_depth)
             
-
-            # ['No.', 'x_min', 'x_max', 'y_min', 'y_max','GT_disp', 'PredDisp', 'EPE', 'GT_depth', 'PredDepth', 'DepthErr']
-            # data = [j, x_min, x_max, y_min, y_max, gt_disp.mean(), pred_disp_bb.mean(), epe, gt_depth.mean(), pred_depth.mean(), depth_err.mean()]
-            # with open(csvFileName, 'a', newline='') as file:
-            #     csvwriter = csv.writer(file)
-            #     csvwriter.writerow(data)
-            
-
+            ### Convert from torch to numpy
+            gt_disp_np = gt_disp.detach().cpu().numpy()
+            pred_disp_np = pred_disp_bb.detach().cpu().numpy()
+            epe_np = epe.detach().cpu().numpy()
 
             for b in range(pred_disp.size(0)):
                 ## Original code
@@ -385,21 +357,32 @@ def main():
                         skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
                         left_imge.save(save_name_left)
 
-                # Distance error
+                ### Distance error
                 dist_error = dist_err((disp_pred * 256.).astype(np.uint16), (disp_gt* 256.).astype(np.uint16), mask.detach().cpu().numpy())
-                dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
-                print('Distance error: ', dist_error)
+                # dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
+                dist_errs += dist_error
+                # print('Distance error: ', dist_error)
 
-        epess += epes
-        areas += area
-        dist_errss += dist_errs
-        if area == 0: continue
-        print('==> Image Avg EPE: ', epes/area)
-        print('==> Image Avg Distance error: ', dist_errs/area)
-
+        ### Summary of image        
+        if num_bbox == 0: continue
+        epess = np.append(epess, epes.detach().cpu().numpy().astype(float))
+        # areas += area
+        dist_errss = np.append(dist_errss,dist_errs)
+        # pdb.set_trace()
+        # if area == 0: continue
+        # print('==> Image Avg EPE: ', epes/area)
+        print('==> Image Avg EPE: ', epes/num_bbox)
+        # print('==> Image Avg Distance error: ', dist_errs/area)
+        print('==> Image Avg Distance error: ', dist_errs/num_bbox)
+        # wandb.log({'img_number': i,'Avg EPE': epes/area, 'Avg Distance error': dist_errs/area})
+        wandb.log({'img_number': i,'Avg EPE': epes/num_bbox, 'Avg Distance error': dist_errs/num_bbox})
+    np.delete(epess, 0)
+    np.delete(dist_errss, 0)
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
     # print('===> Avg EPE: ', epess/areas)
     # print('===> Avg Distance error: ', dist_errss/areas)
+    print('===> Avg EPE: ', epess.mean())
+    print('===> Avg Distance error: ', dist_errss.mean())
 
 if __name__ == '__main__':
     main()
