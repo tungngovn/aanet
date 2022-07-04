@@ -81,7 +81,7 @@ args.output_dir = os.path.join(args.output_dir, model_dir + '-' + model_name)
 utils.check_path(args.output_dir)
 utils.save_command(args.output_dir)
 
-wandb.init(project='AANet+', entity='nttung1cmc', config=args)
+wandb.init(project='AANet+', entity='nttung1cmc', config=args, mode="disabled")
 
 def main():
     # For reproducibility
