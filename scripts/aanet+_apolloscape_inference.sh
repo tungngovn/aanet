@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # Inference on Apolloscape stereo depth estimation dataset
-CUDA_VISIBLE_DEVICES=0 python inference_apollo.py \
+CUDA_VISIBLE_DEVICES=0 python3.6 inference_apollo.py \
 --mode test \
 --data_dir data/apolloscape \
 --dataset_name apolloscape \
---pretrained_aanet checkpoints/apolloscape_large_2nd/aanet_best.pth \
+--pretrained_aanet pretrained/aanet_best.pth \
 --batch_size 1 \
 --max_disp 192 \
 --img_height 960 \

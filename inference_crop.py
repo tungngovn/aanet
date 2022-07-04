@@ -19,7 +19,6 @@ from utils.file_io import write_pfm
 import pdb
 from PIL import Image, ImageDraw
 from metric import d1_metric, thres_metric, dist_err
-import csv
 import wandb
 wandb.login()
 

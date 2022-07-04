@@ -14,6 +14,11 @@ from dataloader import transforms
 from utils import utils
 from utils.file_io import write_pfm
 
+### Tung added libraries
+from metric import d1_metric, thres_metric, dist_err
+import wandb
+wandb.login()
+
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
@@ -76,6 +81,7 @@ args.output_dir = os.path.join(args.output_dir, model_dir + '-' + model_name)
 utils.check_path(args.output_dir)
 utils.save_command(args.output_dir)
 
+wandb.init(project='AANet+', entity='nttung1cmc', config=args)
 
 def main():
     # For reproducibility
@@ -89,6 +95,7 @@ def main():
 
     # Test loader
     test_transform = transforms.Compose([
+        transforms.RandomCrop(args.img_height, args.img_width, validate=True),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)])
     test_data = dataloader.StereoDataset(data_dir=args.data_dir,
@@ -140,6 +147,8 @@ def main():
 
     num_samples = len(test_loader)
     print('=> %d samples found in the test set' % num_samples)
+
+    wandb.watch(aanet)
 
     for i, sample in enumerate(test_loader):
         if args.count_time and i == args.num_images:  # testing time only
