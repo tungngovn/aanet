@@ -252,13 +252,13 @@ def main():
                     pred_disp = pred_disp[:, top_pad:]
 
             ### Region of Interest
-            offset_x = int(crop_width/2-8)
+            offset_x = int(crop_width/2-2)
             if offset_x <=0: offset_x = 1
             # offset = 1
             x_min_bb = 96 + offset_x
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset_x
 
-            offset_y = int(crop_height/2-8)
+            offset_y = int(crop_height/2-2)
             if offset_y <=0:  offset_y = 1
             y_min_bb = (96-crop_height%96) + offset_y
             pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
@@ -357,7 +357,6 @@ def main():
                         left_imge.save(save_name_left)
 
                 ### Distance error
-                pdb.set_trace()
                 dist_error = dist_err((disp_pred * 256.).astype(np.uint16), (disp_gt* 256.).astype(np.uint16), mask[b].detach().cpu().numpy())
                 # dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
                 dist_errs += dist_error
@@ -368,7 +367,6 @@ def main():
         epess = np.append(epess, epes.detach().cpu().numpy().astype(float))
         # areas += area
         dist_errss = np.append(dist_errss,dist_errs)
-        # pdb.set_trace()
         # if area == 0: continue
         # print('==> Image Avg EPE: ', epes/area)
         print('==> Image Avg EPE: ', epes/num_bbox)
