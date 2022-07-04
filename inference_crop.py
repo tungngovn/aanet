@@ -19,8 +19,8 @@ from utils.file_io import write_pfm
 import pdb
 from PIL import Image, ImageDraw
 from metric import d1_metric, thres_metric, dist_err
-import wandb
-wandb.login()
+# import wandb
+# wandb.login()
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
@@ -84,7 +84,7 @@ args.output_dir = os.path.join(args.output_dir, model_dir + '-' + model_name)
 utils.check_path(args.output_dir)
 utils.save_command(args.output_dir)
 
-wandb.init(project='AANet+', entity='nttung1cmc', config=args, mode="disabled")
+# wandb.init(project='AANet+', entity='nttung1cmc', config=args, mode="disabled")
 
 def main():
     # For reproducibility
@@ -161,17 +161,17 @@ def main():
     print('=> %d samples found in the test set' % num_samples)
 
     epess = np.array([0])
-    areas = 0
+    # areas = 0
     dist_errss = np.array([0])
 
-    wandb.watch(aanet)
+    # wandb.watch(aanet)
 
     for i, sample in enumerate(test_loader):
         if args.count_time and i == args.num_images:  # testing time only
             break
 
         epes = 0
-        area = 0
+        # area = 0
         dist_errs = 0
         num_bbox = 0
 
@@ -287,15 +287,15 @@ def main():
             num_imgs += left.size(0)
             num_bbox += 1
 
-            ### Calculate depth error
-            gt_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
-            pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
-            depth_err = abs(gt_depth - pred_depth)
+            # ### Calculate depth error
+            # gt_depth = Sys.disp2depth(gt_disp.detach().cpu().numpy())
+            # pred_depth = Sys.disp2depth(pred_disp_bb.detach().cpu().numpy())
+            # depth_err = abs(gt_depth - pred_depth)
             
-            ### Convert from torch to numpy
-            gt_disp_np = gt_disp.detach().cpu().numpy()
-            pred_disp_np = pred_disp_bb.detach().cpu().numpy()
-            epe_np = epe.detach().cpu().numpy()
+            # ### Convert from torch to numpy
+            # gt_disp_np = gt_disp.detach().cpu().numpy()
+            # pred_disp_np = pred_disp_bb.detach().cpu().numpy()
+            # epe_np = epe.detach().cpu().numpy()
 
             for b in range(pred_disp.size(0)):
                 ## Original code
@@ -305,56 +305,56 @@ def main():
 
                 ## Pred_disp
                 disp_pred = pred_disp_bb[b].detach().cpu().numpy()  # [H, W]
-                # disp_pred = pred_disp[b].detach().cpu().numpy()  # [H, W] # full predicted region
-                save_name_pred = sample['left_name'][b][:-4] + '_pred_' + str(j) + '.png'
-                save_name_pred = os.path.join(args.output_dir, save_name_pred)
+                # # disp_pred = pred_disp[b].detach().cpu().numpy()  # [H, W] # full predicted region
+                # save_name_pred = sample['left_name'][b][:-4] + '_pred_' + str(j) + '.png'
+                # save_name_pred = os.path.join(args.output_dir, save_name_pred)
 
-                ## GT disp
+                # ## GT disp
                 disp_gt = gt_disp[b].detach().cpu().numpy()  # [H, W]
-                save_name_gt = sample['left_name'][b][:-4] + '_gt_' + str(j) + '.png'
-                save_name_gt = os.path.join(args.output_dir, save_name_gt)
+                # save_name_gt = sample['left_name'][b][:-4] + '_gt_' + str(j) + '.png'
+                # save_name_gt = os.path.join(args.output_dir, save_name_gt)
 
-                # ## Cropped left image
-                left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy().astype('uint16'),'RGB')
-                save_name_left = sample['left_name'][b][:-4] + '_left_' + str(j) + '.png'
-                save_name_left = os.path.join(args.output_dir, save_name_left)
+                # # ## Cropped left image
+                # left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy().astype('uint16'),'RGB')
+                # save_name_left = sample['left_name'][b][:-4] + '_left_' + str(j) + '.png'
+                # save_name_left = os.path.join(args.output_dir, save_name_left)
 
                 # utils.check_path(os.path.dirname(save_name))
-                utils.check_path(os.path.dirname(save_name_pred))
-                utils.check_path(os.path.dirname(save_name_gt))
-                if not args.count_time:
-                    if args.save_type == 'pfm':
-                        if args.visualize:
-                            # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
-                            skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
-                            skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
+                # utils.check_path(os.path.dirname(save_name_pred))
+                # utils.check_path(os.path.dirname(save_name_gt))
+                # if not args.count_time:
+                #     if args.save_type == 'pfm':
+                #         if args.visualize:
+                #             # # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+                #             # skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
+                #             # skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
 
-                        ## Original code
-                        # save_name = save_name[:-3] + 'pfm'
-                        # write_pfm(save_name, disp)
+                #         ## Original code
+                #         # save_name = save_name[:-3] + 'pfm'
+                #         # write_pfm(save_name, disp)
 
-                        ## Pred
-                        save_name_pred = save_name_pred[:-3] + 'pfm'
-                        write_pfm(save_name_pred, disp_pred)
-                        ## GT
-                        save_name_gt = save_name_gt[:-3] + 'pfm'
-                        write_pfm(save_name_gt, disp_gt)
-                    elif args.save_type == 'npy':
-                        ## Original code
-                        # save_name = save_name[:-3] + 'npy'
-                        # np.save(save_name, disp)
+                #         # ## Pred
+                #         # save_name_pred = save_name_pred[:-3] + 'pfm'
+                #         # write_pfm(save_name_pred, disp_pred)
+                #         # ## GT
+                #         # save_name_gt = save_name_gt[:-3] + 'pfm'
+                #         # write_pfm(save_name_gt, disp_gt)
+                #     elif args.save_type == 'npy':
+                #         ## Original code
+                #         # save_name = save_name[:-3] + 'npy'
+                #         # np.save(save_name, disp)
 
-                        ## Pred
-                        save_name_pred = save_name_pred[:-3] + 'npy'
-                        np.save(save_name_pred, disp_pred)
+                #         ## Pred
+                #         save_name_pred = save_name_pred[:-3] + 'npy'
+                #         np.save(save_name_pred, disp_pred)
 
-                        save_name_gt = save_name_gt[:-3] + 'npy'
-                        np.save(save_name_gt, disp_gt)
-                    else:
-                        # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
-                        skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
-                        skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
-                        left_imge.save(save_name_left)
+                #         save_name_gt = save_name_gt[:-3] + 'npy'
+                #         np.save(save_name_gt, disp_gt)
+                #     else:
+                #         # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+                #         skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
+                #         skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
+                #         left_imge.save(save_name_left)
 
                 ### Distance error
                 dist_error = dist_err((disp_pred * 256.).astype(np.uint16), (disp_gt* 256.).astype(np.uint16), mask[b].detach().cpu().numpy())
@@ -372,8 +372,8 @@ def main():
         print('==> Image Avg EPE: ', epes/num_bbox)
         # print('==> Image Avg Distance error: ', dist_errs/area)
         print('==> Image Avg Distance error: ', dist_errs/num_bbox)
-        # wandb.log({'img_number': i,'Avg EPE': epes/area, 'Avg Distance error': dist_errs/area})
-        wandb.log({'img_number': i,'Avg EPE': epes/num_bbox, 'Avg Distance error': dist_errs/num_bbox})
+        # # wandb.log({'img_number': i,'Avg EPE': epes/area, 'Avg Distance error': dist_errs/area})
+        # wandb.log({'img_number': i,'Avg EPE': epes/num_bbox, 'Avg Distance error': dist_errs/num_bbox})
     np.delete(epess, 0)
     np.delete(dist_errss, 0)
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
