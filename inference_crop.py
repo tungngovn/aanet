@@ -442,7 +442,7 @@ def main():
         print('==> Image Avg Distance error: ', dist_errs/num_bbox)
         # wandb.log({'img_number': i,'Avg EPE': epes/area, 'Avg Distance error': dist_errs/area})
         wandb.log({'img_number': i,'Avg EPE': epes/num_bbox, 'Avg Distance error': dist_errs/num_bbox})
-    pdb.set_trace()
+    # pdb.set_trace()
     np.delete(epess, 0)
     np.delete(dist_errss, 0)
     print('===> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))

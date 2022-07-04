@@ -89,6 +89,7 @@ def main():
 
     # Test loader
     test_transform = transforms.Compose([
+        transforms.RandomCrop(args.img_height, args.img_width, validate=True),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)])
     test_data = dataloader.StereoDataset(data_dir=args.data_dir,
