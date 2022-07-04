@@ -368,8 +368,8 @@ def main():
                 # save_name = os.path.join(args.output_dir, save_name)
 
                 ## Pred_disp
-                disp_pred = pred_disp_bb[b].detach().cpu().numpy()  # [H, W]
-                # disp_pred = pred_disp[b].detach().cpu().numpy()  # [H, W] # full predicted region
+                # disp_pred = pred_disp_bb[b].detach().cpu().numpy()  # [H, W]
+                disp_pred = pred_disp[b].detach().cpu().numpy()  # [H, W] # full predicted region
                 save_name_pred = sample['left_name'][b][:-4] + '_pred_' + str(j) + '.png'
                 save_name_pred = os.path.join(args.output_dir, save_name_pred)
 
