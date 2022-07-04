@@ -358,7 +358,7 @@ def main():
 
                 ### Distance error
                 pdb.set_trace()
-                dist_error = dist_err((disp_pred * 256.).astype(np.uint16), (disp_gt* 256.).astype(np.uint16), mask.detach().cpu().numpy())
+                dist_error = dist_err((disp_pred * 256.).astype(np.uint16), (disp_gt* 256.).astype(np.uint16), mask[b].detach().cpu().numpy())
                 # dist_errs += dist_error*(x_max - x_min_bb)*(y_max-y_min_bb)
                 dist_errs += dist_error
                 # print('Distance error: ', dist_error)
