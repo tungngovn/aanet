@@ -16,8 +16,8 @@ from utils.file_io import write_pfm
 
 ### Tung added libraries
 from metric import d1_metric, thres_metric, dist_err
-import wandb
-wandb.login()
+# import wandb
+# wandb.login()
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
@@ -81,7 +81,7 @@ args.output_dir = os.path.join(args.output_dir, model_dir + '-' + model_name)
 utils.check_path(args.output_dir)
 utils.save_command(args.output_dir)
 
-wandb.init(project='AANet+', entity='nttung1cmc', config=args, mode="disabled")
+# wandb.init(project='AANet+', entity='nttung1cmc', config=args, mode="disabled")
 
 def main():
     # For reproducibility
@@ -148,7 +148,7 @@ def main():
     num_samples = len(test_loader)
     print('=> %d samples found in the test set' % num_samples)
 
-    wandb.watch(aanet)
+    # wandb.watch(aanet)
 
     for i, sample in enumerate(test_loader):
         if args.count_time and i == args.num_images:  # testing time only
@@ -196,23 +196,23 @@ def main():
             else:
                 pred_disp = pred_disp[:, top_pad:]
 
-        for b in range(pred_disp.size(0)):
-            disp = pred_disp[b].detach().cpu().numpy()  # [H, W]
-            save_name = sample['left_name'][b]
-            save_name = os.path.join(args.output_dir, save_name)
-            utils.check_path(os.path.dirname(save_name))
-            if not args.count_time:
-                if args.save_type == 'pfm':
-                    if args.visualize:
-                        skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
+        # for b in range(pred_disp.size(0)):
+        #     disp = pred_disp[b].detach().cpu().numpy()  # [H, W]
+        #     save_name = sample['left_name'][b]
+        #     save_name = os.path.join(args.output_dir, save_name)
+        #     utils.check_path(os.path.dirname(save_name))
+        #     if not args.count_time:
+        #         if args.save_type == 'pfm':
+        #             if args.visualize:
+        #                 skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
 
-                    save_name = save_name[:-3] + 'pfm'
-                    write_pfm(save_name, disp)
-                elif args.save_type == 'npy':
-                    save_name = save_name[:-3] + 'npy'
-                    np.save(save_name, disp)
-                else:
-                    skimage.io.imsave(save_name[:-3] + 'png', (disp * 256.).astype(np.uint16))
+        #             save_name = save_name[:-3] + 'pfm'
+        #             write_pfm(save_name, disp)
+        #         elif args.save_type == 'npy':
+        #             save_name = save_name[:-3] + 'npy'
+        #             np.save(save_name, disp)
+        #         else:
+        #             skimage.io.imsave(save_name[:-3] + 'png', (disp * 256.).astype(np.uint16))
 
     print('=> Mean inference time for %d images: %.3fs' % (num_imgs, inference_time / num_imgs))
 
