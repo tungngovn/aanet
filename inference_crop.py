@@ -148,7 +148,8 @@ def main():
 
     ## Camera parameters
     K = np.array([[2301.3147, 0, 1489.8536], [0, 2301.3147, 479.1750],[0, 0, 1]]) # intrinsic matrix of apolloscape dataset
-    baseline = 0.622
+    # baseline = 0.622 ## wrong number
+    baseline = 0.416
 
     ## Init disp to depth class
     Sys = Disp2Depth(K, baseline)    
@@ -177,7 +178,7 @@ def main():
             break
 
         ### Mean csv file initialization
-        csvFileName = sample['left_name'][0][:-4] + '_16x16.csv'
+        csvFileName = sample['left_name'][0][:-4] + '_4x4.csv'
         csvFileName = os.path.join(args.output_dir, csvFileName)
         
         with open(csvFileName, 'w', newline='') as file:
@@ -185,7 +186,7 @@ def main():
             csvwriter.writerow(csvHeader)
 
         ### Median csv file initialization
-        csvFileName_median = sample['left_name'][0][:-4] + '_median_16x16.csv'
+        csvFileName_median = sample['left_name'][0][:-4] + '_median_4x4.csv'
         csvFileName_median = os.path.join(args.output_dir, csvFileName_median)
         
         with open(csvFileName_median, 'w', newline='') as file:
@@ -297,13 +298,13 @@ def main():
                     pred_disp = pred_disp[:, top_pad:]
 
             ### Region of Interest
-            offset_x = int(crop_width/2-8)
+            offset_x = int(crop_width/2-2)
             if offset_x <=0: offset_x = 1
             # offset = 1
             x_min_bb = 96 + offset_x
             x_max_bb = x_max_p - x_min_p - (96-crop_width%96) - offset_x
 
-            offset_y = int(crop_height/2-8)
+            offset_y = int(crop_height/2-2)
             if offset_y <=0:  offset_y = 1
             y_min_bb = (96-crop_height%96) + offset_y
             pred_disp_bb = pred_disp[:, y_min_bb:-offset_y, x_min_bb:x_max_bb]
@@ -378,10 +379,10 @@ def main():
                 save_name_gt = sample['left_name'][b][:-4] + '_gt_' + str(j) + '.png'
                 save_name_gt = os.path.join(args.output_dir, save_name_gt)
 
-                # ## Cropped left image
-                left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy().astype('uint16'),'RGB')
-                save_name_left = sample['left_name'][b][:-4] + '_left_' + str(j) + '.png'
-                save_name_left = os.path.join(args.output_dir, save_name_left)
+                # # ## Cropped left image
+                # left_imge = Image.fromarray(left[0].permute(1,2,0).detach().cpu().numpy().astype('uint16'),'RGB')
+                # save_name_left = sample['left_name'][b][:-4] + '_left_' + str(j) + '.png'
+                # save_name_left = os.path.join(args.output_dir, save_name_left)
 
                 # utils.check_path(os.path.dirname(save_name))
                 utils.check_path(os.path.dirname(save_name_pred))
@@ -418,7 +419,7 @@ def main():
                         # skimage.io.imsave(save_name, (disp * 256.).astype(np.uint16))
                         skimage.io.imsave(save_name_pred, (disp_pred * 256.).astype(np.uint16))
                         skimage.io.imsave(save_name_gt, (disp_gt * 256.).astype(np.uint16))
-                        left_imge.save(save_name_left)
+                        # left_imge.save(save_name_left)
 
                 # ### Distance error
                 # #### Add for the full predicted region 
