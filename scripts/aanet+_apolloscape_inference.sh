@@ -8,8 +8,8 @@ CUDA_VISIBLE_DEVICES=0 python inference_apollo.py \
 --pretrained_aanet checkpoints/apolloscape_large_2nd/aanet_best.pth \
 --batch_size 1 \
 --max_disp 192 \
---img_height 960 \
---img_width 3072 \
+--img_height 576 \
+--img_width 1920 \
 --feature_type ganet \
 --feature_pyramid \
 --refinement_type hourglass \
